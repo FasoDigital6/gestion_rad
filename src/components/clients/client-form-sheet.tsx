@@ -27,7 +27,6 @@ import { useCreateClient, useUpdateClient } from "@/lib/hooks/use-clients";
 import { Client } from "@/lib/types/client";
 import { Loader2 } from "lucide-react";
 
-// Schéma de validation avec Zod
 const clientFormSchema = z.object({
   nom: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
   email: z.string().email("Email invalide"),
@@ -77,7 +76,6 @@ export function ClientFormSheet({
 
   const statut = watch("statut");
 
-  // Charger les données du client en mode édition
   useEffect(() => {
     if (client) {
       reset({
@@ -106,7 +104,7 @@ export function ClientFormSheet({
     try {
       if (isEditing) {
         await updateMutation.mutateAsync({
-          id: client.id,
+          id: client!.id,
           ...data,
         });
       } else {
@@ -135,7 +133,6 @@ export function ClientFormSheet({
           </SheetHeader>
 
           <div className="grid gap-6 py-6">
-            {/* Nom */}
             <div className="grid gap-3">
               <Label htmlFor="nom">
                 Nom du client <span className="text-red-600">*</span>
@@ -150,7 +147,6 @@ export function ClientFormSheet({
               )}
             </div>
 
-            {/* Email */}
             <div className="grid gap-3">
               <Label htmlFor="email">
                 Email <span className="text-red-600">*</span>
@@ -166,7 +162,6 @@ export function ClientFormSheet({
               )}
             </div>
 
-            {/* Téléphone */}
             <div className="grid gap-3">
               <Label htmlFor="telephone">
                 Téléphone <span className="text-red-600">*</span>
@@ -183,7 +178,6 @@ export function ClientFormSheet({
               )}
             </div>
 
-            {/* Adresse */}
             <div className="grid gap-3">
               <Label htmlFor="adresse">
                 Adresse <span className="text-red-600">*</span>
@@ -198,7 +192,6 @@ export function ClientFormSheet({
               )}
             </div>
 
-            {/* IFU */}
             <div className="grid gap-3">
               <Label htmlFor="ifu">IFU (Optionnel)</Label>
               <Input
@@ -211,7 +204,6 @@ export function ClientFormSheet({
               )}
             </div>
 
-            {/* RCCM */}
             <div className="grid gap-3">
               <Label htmlFor="rccm">RCCM (Optionnel)</Label>
               <Input
@@ -224,7 +216,6 @@ export function ClientFormSheet({
               )}
             </div>
 
-            {/* Statut */}
             <div className="grid gap-3">
               <Label htmlFor="statut">
                 Statut <span className="text-red-600">*</span>

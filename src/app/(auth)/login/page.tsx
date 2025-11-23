@@ -62,32 +62,32 @@ export default function LoginPage() {
   }
 
   return (
-    /* Changed background to warm beige with subtle gradient */
-    <div className="flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 px-4 py-8">
-      <div className="w-full max-w-md">
-        <Card className="border-0 bg-white shadow-lg overflow-hidden">
-          <div className="flex justify-center pt-8 pb-2">
+    <div className="flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-br from-[#f8f4ea] via-white to-[#f0ead9] px-4 py-10 text-slate-900">
+      <div className="w-full max-w-4xl">
+        <Card className="mx-auto max-w-2xl rounded-2xl border border-slate-200 shadow-[0_12px_50px_rgba(0,0,0,0.08)]">
+          <div className="flex justify-center pt-10 pb-4">
             <Image
               src="/imgs/logo.png"
               alt="Gestion RAD Logo"
-              width={140}
-              height={60}
-              className="h-auto w-auto max-h-14"
+              width={190}
+              height={80}
+              className="h-auto w-auto"
               priority
             />
           </div>
 
-          <CardContent className="pt-6 pb-8">
+          <CardContent className="px-10 pb-12 pt-2">
             <div className="space-y-8">
               <div className="text-center space-y-2">
-                <h1 className="text-3xl font-bold text-foreground">Connectez-vous à votre Compte</h1>
-                <p className="text-sm text-muted-foreground">Accédez à votre espace de gestion</p>
+                <h1 className="text-2xl font-semibold text-slate-900">Connectez-vous à votre Compte</h1>
               </div>
 
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   {error && (
-                    <div className="bg-red-50 text-red-700 text-sm p-4 rounded-lg border border-red-200">{error}</div>
+                    <div className="rounded-lg border border-red-200 bg-red-50 text-sm text-red-700 px-4 py-3">
+                      {error}
+                    </div>
                   )}
 
                   {/* Email Field */}
@@ -96,12 +96,12 @@ export default function LoginPage() {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm font-semibold text-foreground">Email</FormLabel>
+                        <FormLabel className="text-sm font-semibold text-slate-900">Email</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="Votre adresse email"
                             type="email"
-                            className="h-11 bg-white border-2 border-gray-200 text-foreground placeholder:text-gray-400 focus:border-primary focus:ring-0"
+                            className="h-11 rounded-md border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-blue-700 focus:ring-2 focus:ring-blue-100"
                             {...field}
                           />
                         </FormControl>
@@ -116,19 +116,20 @@ export default function LoginPage() {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm font-semibold text-foreground">Mot de passe</FormLabel>
+                        <FormLabel className="text-sm font-semibold text-slate-900">Mot de passe</FormLabel>
                         <FormControl>
                           <div className="relative">
                             <Input
                               type={showPassword ? "text" : "password"}
-                              placeholder="••••••••"
-                              className="h-11 bg-white border-2 border-gray-200 text-foreground placeholder:text-gray-400 focus:border-primary focus:ring-0 pr-10"
+                              placeholder="Votre mot de passe"
+                              className="h-11 rounded-md border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 pr-11 focus:border-blue-700 focus:ring-2 focus:ring-blue-100"
                               {...field}
                             />
                             <button
                               type="button"
                               onClick={() => setShowPassword(!showPassword)}
-                              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-foreground transition-colors"
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 transition-colors"
+                              aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
                             >
                               {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                             </button>
@@ -140,26 +141,26 @@ export default function LoginPage() {
                   />
 
                   {/* Remember Me & Forgot Password */}
-                  <div className="flex items-center justify-between pt-2">
+                  <div className="flex items-center justify-between pt-1">
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         id="remember"
                         checked={rememberMe}
                         onCheckedChange={(checked: boolean) => setRememberMe(checked)}
-                        className="border-gray-300"
+                        className="border-slate-300 data-[state=checked]:bg-blue-700 data-[state=checked]:border-blue-700"
                       />
-                      <label htmlFor="remember" className="text-sm font-medium text-foreground cursor-pointer">
+                      <label htmlFor="remember" className="text-sm font-medium text-slate-800 cursor-pointer">
                         Se souvenir de moi
                       </label>
                     </div>
-                    <a href="#" className="text-sm font-medium text-primary hover:text-primary/80 transition-colors">
+                    <a href="#" className="text-sm font-semibold text-blue-700 hover:text-blue-800 transition-colors">
                       Mot de passe oublié ?
                     </a>
                   </div>
 
                   <Button
                     type="submit"
-                    className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-bold text-base transition-all duration-200 rounded-lg shadow-md hover:shadow-lg mt-8"
+                    className="mt-2 h-11 w-full rounded-md bg-[#0f2547] text-base font-semibold text-white shadow-sm transition hover:brightness-110 focus-visible:ring-2 focus-visible:ring-blue-200"
                     disabled={isLoading}
                   >
                     {isLoading ? "Connexion en cours..." : "Se connecter"}
@@ -170,13 +171,10 @@ export default function LoginPage() {
           </CardContent>
         </Card>
 
-        {/* Footer with Contact Info */}
-        <div className="text-center text-sm text-gray-600 space-y-2 mt-8">
-          <p className="font-semibold text-foreground">© 2025 Gestion RAD. Tous droits réservés.</p>
-          <div className="space-y-1 text-xs">
-            <p>contact@radguinee.com</p>
-            <p>+224 622 39 21 60</p>
-          </div>
+        <div className="mt-10 text-center text-sm text-slate-600 space-y-1">
+          <p className="font-semibold text-slate-700">© 2025 Gestion RAD. Tous droits réservés.</p>
+          <p className="text-xs">contact@radguinee.com</p>
+          <p className="text-xs">+224 622 39 21 60</p>
         </div>
       </div>
     </div>

@@ -31,47 +31,52 @@ export function GlobalNav() {
   const user = useAuth();
 
   return (
-    <div className="fixed top-0 z-10 flex flex-col w-full bg-muted lg:bottom-0 lg:z-auto lg:w-72 ">
-      <div className="flex items-center px-4 py-4 h-14 lg:h-auto">
+    <div className="fixed top-0 z-20 flex w-full flex-col bg-[#f5f7fb] text-slate-800 shadow-sm lg:bottom-0 lg:z-auto lg:w-72 lg:border-r lg:border-slate-200">
+      <div className="flex flex-col items-center justify-center gap-2 px-5 py-5 h-20 lg:h-auto text-center">
         <Link
           href="/"
-          className="flex justify-center items-baseline w-full group gap-x-2"
+          className="flex flex-col items-center gap-2 w-full"
           onClick={close}
         >
-          <div className="w-28">
-            <Logo />
+          <div className="w-32">
+            <Logo className="mx-auto" />
           </div>
-          <h3 className="text-sm bg-secondary/10 px-2  font-semibold tracking-wide text-secondary uppercase">
-            Gestion
-          </h3>
+          <div className="leading-tight">
+            <div className="text-sm font-bold uppercase tracking-[0.12em] text-[#0b63b5]">
+              GESTPRO
+            </div>
+            <div className="text-[11px] uppercase tracking-[0.12em] text-slate-500">
+              Gestion interne
+            </div>
+          </div>
         </Link>
       </div>
+
       <button
         type="button"
-        className="absolute top-0 right-0 flex items-center px-4 group h-14 gap-x-2 lg:hidden"
+        className="absolute top-0 right-0 flex items-center px-4 h-14 gap-x-2 lg:hidden text-slate-700"
         onClick={() => setIsOpen(!isOpen)}
+        aria-expanded={isOpen}
       >
-        <div className="font-medium text-primary group-hover:text-primary/80">
-          Menu
-        </div>
+        <div className="font-medium">Menu</div>
         {isOpen ? <RiCloseLine /> : <RiMenu2Line />}
       </button>
 
       <div
         className={clsx(
-          "overflow-y-auto lg:static lg:block flex flex-col justify-between",
+          "overflow-y-auto lg:static lg:block flex flex-col justify-between transition-[transform,opacity] duration-200 lg:translate-y-0 lg:opacity-100",
           {
-            "fixed inset-x-0 bottom-0 top-14 mt-px bg-slate-100": isOpen,
-            hidden: !isOpen,
+            "fixed inset-x-0 bottom-0 top-14 bg-[#f5f7fb] translate-y-0 opacity-100": isOpen,
+            "hidden -translate-y-2 opacity-0": !isOpen,
           }
         )}
       >
-        <nav className="px-2 py-2 space-y-6 ">
+        <nav className="px-4 py-4 space-y-6">
           {navItems.map((section) => {
             return (
               <div key={section.name}>
-                <div className="px-3 mb-2 text-[10px] tracking-wider font-semibold uppercase text-gray-400/80">
-                  <div>{section.name}</div>
+                <div className="px-2 mb-2 text-[11px] tracking-[0.18em] font-semibold uppercase text-slate-400">
+                  {section.name}
                 </div>
 
                 <div className="space-y-1">
@@ -84,40 +89,40 @@ export function GlobalNav() {
           })}
         </nav>
 
-        <div className="border-t mt-auto">
-          <div className="px-3 py-4">
-            <div className="flex items-center gap-3 mb-3 px-2">
-              <Avatar className="h-10 w-10">
+        <div className="border-t border-slate-200 mt-auto">
+          <div className="px-4 py-4 space-y-2">
+            <div className="flex items-center gap-3 px-1">
+              <Avatar className="h-10 w-10 border border-slate-200">
                 <AvatarImage src="/placeholder-avatar.jpg" alt="User avatar" />
-                <AvatarFallback>
+                <AvatarFallback className="bg-slate-100 text-slate-700">
                   {user?.displayName?.charAt(0) || "U"}
                 </AvatarFallback>
               </Avatar>
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-700">
+                <span className="text-sm font-semibold text-slate-800">
                   {user?.displayName || "User Name"}
                 </span>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-slate-500">
                   {user?.email || "user@email.com"}
                 </span>
               </div>
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1 pt-2">
               <Link
                 href="/staff/dashboard"
                 onClick={close}
-                className="flex items-center w-full gap-x-3 rounded-md px-3 py-2 text-sm font-medium text-gray-800 hover:bg-secondary hover:text-white group"
+                className="flex items-center w-full gap-x-3 rounded-md px-3 py-2 text-sm font-medium text-slate-800 hover:bg-[#e8f1fb] hover:text-[#0b63b5] transition"
               >
-                <RiAccountCircleFill className="text-secondary h-5 w-5 group-hover:text-white" />
+                <RiAccountCircleFill className="h-5 w-5 text-[#0b63b5]" />
                 Mon profil
               </Link>
 
               <button
                 onClick={handleLogout}
-                className="flex items-center w-full gap-x-3 rounded-md px-3 py-2 text-sm font-medium text-gray-800 hover:bg-secondary hover:text-white group"
+                className="flex items-center w-full gap-x-3 rounded-md px-3 py-2 text-sm font-medium text-slate-800 hover:bg-[#e8f1fb] hover:text-[#0b63b5] transition"
               >
-                <RiLogoutBoxRLine className="text-secondary h-5 w-5 group-hover:text-white" />
+                <RiLogoutBoxRLine className="h-5 w-5 text-[#0b63b5]" />
                 Déconnexion
               </button>
             </div>
@@ -145,19 +150,19 @@ function GlobalNavItem({
       onClick={close}
       href={`/${item.slug}`}
       className={clsx(
-        "flex items-center gap-x-3 rounded-md px-3 py-2 text-sm group font-medium hover:text-white",
-        {
-          "text-gray-800 hover:bg-secondary": !isActive,
-          "text-white bg-secondary": isActive,
-        }
+        "group flex items-center gap-x-3 rounded-md px-3 py-2 text-sm font-semibold transition-colors",
+        isActive
+          ? "bg-[#0b63b5] text-white shadow-sm"
+          : "text-slate-800 hover:bg-[#e8f1fb] hover:text-[#0b63b5]"
       )}
     >
       <item.icon
-        className={clsx("text-secondary h-5 w-5  group-hover:text-white", {
+        className={clsx("h-5 w-5 transition-colors", {
           "text-white": isActive,
+          "text-slate-700 group-hover:text-[#0b63b5]": !isActive,
         })}
       />
-      {item.name}
+      <span>{item.name}</span>
     </Link>
   );
 }

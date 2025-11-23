@@ -41,7 +41,6 @@ export default function ClientDetailPage() {
 
   return (
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      {/* En-tête */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button
@@ -66,16 +65,10 @@ export default function ClientDetailPage() {
         </div>
       </div>
 
-      {/* Informations principales */}
       <ClientInfoCard client={client} />
-
-      {/* Statistiques financières */}
       <ClientFinancialStats client={client} />
-
-      {/* Documents liés */}
       <ClientDocumentsTabs clientId={client.id} />
 
-      {/* Formulaire d'édition */}
       <ClientFormSheet
         open={isFormOpen}
         onOpenChange={setIsFormOpen}
