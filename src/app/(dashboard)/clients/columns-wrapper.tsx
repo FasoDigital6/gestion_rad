@@ -5,6 +5,7 @@ import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Client } from "@/lib/types/client";
 import { ClientActions } from "@/components/clients/client-actions";
+import Link from "next/link";
 
 export function createColumns(
   onEdit: (client: Client) => void
@@ -26,7 +27,15 @@ export function createColumns(
         );
       },
       cell: ({ row }) => {
-        return <div className="font-medium">{row.getValue("nom")}</div>;
+        const client = row.original;
+        return (
+          <Link
+            href={`/clients/${client.id}`}
+            className="font-medium text-primary hover:underline"
+          >
+            {row.getValue("nom")}
+          </Link>
+        );
       },
     },
     {
@@ -80,7 +89,7 @@ export function createColumns(
         const amount = parseFloat(row.getValue("totalDu"));
         const formatted = new Intl.NumberFormat("fr-FR", {
           style: "currency",
-          currency: "XOF",
+          currency: "GNF",
           minimumFractionDigits: 0,
         }).format(amount);
 
