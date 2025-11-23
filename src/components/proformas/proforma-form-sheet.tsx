@@ -148,7 +148,7 @@ export function ProformaFormSheet({
     try {
       if (isEditing) {
         await updateMutation.mutateAsync({
-          id: proforma!.id,
+          id: proforma.id,
           ...data,
           clientNom,
         });
