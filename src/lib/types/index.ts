@@ -13,3 +13,4 @@ export * from "./bdc";
 export * from "./bl";
 export * from "./facture";
 export * from "./paiement";
+export * from "./depense";
