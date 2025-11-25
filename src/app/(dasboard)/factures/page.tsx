@@ -1,13 +1,22 @@
 "use client";
 
+import { useState } from "react";
 import { DataTable } from "@/components/data-table/data-table";
 import { columns } from "./columns";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useFactures } from "@/lib/hooks/use-factures";
+import { FactureFormSheet } from "@/components/factures/facture-form-sheet";
+import { useAuth } from "@/lib/context/auth-context";
 
 export default function FacturesPage() {
   const { data: factures, isLoading, error } = useFactures();
+  const { user } = useAuth();
+  const [isFormOpen, setIsFormOpen] = useState(false);
+
+  const handleAddFacture = () => {
+    setIsFormOpen(true);
+  };
 
   return (
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
@@ -18,7 +27,7 @@ export default function FacturesPage() {
             Facturation et suivi des paiements
           </p>
         </div>
-        <Button>
+        <Button onClick={handleAddFacture}>
           <Plus className="mr-2 h-4 w-4" />
           Nouvelle facture
         </Button>
@@ -42,6 +51,12 @@ export default function FacturesPage() {
           filterPlaceholder="Rechercher une facture..."
         />
       )}
+
+      <FactureFormSheet
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        userId={user?.uid || ""}
+      />
     </div>
   );
 }

@@ -1,16 +1,25 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus } from "lucide-react";
 import { useDepenses, useStatistiquesDepenses } from "@/lib/hooks/use-depenses";
+import { DepenseFormSheet } from "@/components/depenses/depense-form-sheet";
+import { useAuth } from "@/lib/context/auth-context";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
 export default function DepensesPage() {
   const { data: depenses, isLoading } = useDepenses();
   const { data: stats } = useStatistiquesDepenses();
+  const { user } = useAuth();
+  const [isFormOpen, setIsFormOpen] = useState(false);
+
+  const handleAddDepense = () => {
+    setIsFormOpen(true);
+  };
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("fr-FR", {
@@ -43,7 +52,7 @@ export default function DepensesPage() {
             Dépenses et factures fournisseurs
           </p>
         </div>
-        <Button>
+        <Button onClick={handleAddDepense}>
           <Plus className="mr-2 h-4 w-4" />
           Nouvelle dépense
         </Button>
@@ -139,7 +148,7 @@ export default function DepensesPage() {
               <p className="text-muted-foreground mb-4">
                 Aucune dépense enregistrée
               </p>
-              <Button variant="outline">
+              <Button variant="outline" onClick={handleAddDepense}>
                 <Plus className="mr-2 h-4 w-4" />
                 Ajouter une dépense
               </Button>
@@ -178,6 +187,12 @@ export default function DepensesPage() {
           )}
         </CardContent>
       </Card>
+
+      <DepenseFormSheet
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        userId={user?.uid || ""}
+      />
     </div>
   );
 }

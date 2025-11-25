@@ -1,13 +1,22 @@
 "use client";
 
+import { useState } from "react";
 import { DataTable } from "@/components/data-table/data-table";
 import { columns } from "./columns";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useBDCs } from "@/lib/hooks/use-bdc";
+import { BDCFormSheet } from "@/components/bdc/bdc-form-sheet";
+import { useAuth } from "@/lib/context/auth-context";
 
 export default function BDCPage() {
   const { data: bdcs, isLoading, error } = useBDCs();
+  const { user } = useAuth();
+  const [isFormOpen, setIsFormOpen] = useState(false);
+
+  const handleAddBDC = () => {
+    setIsFormOpen(true);
+  };
 
   return (
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
@@ -18,7 +27,7 @@ export default function BDCPage() {
             Suivi des bons de commande clients
           </p>
         </div>
-        <Button>
+        <Button onClick={handleAddBDC}>
           <Plus className="mr-2 h-4 w-4" />
           Nouveau BDC
         </Button>
@@ -42,6 +51,12 @@ export default function BDCPage() {
           filterPlaceholder="Rechercher un BDC..."
         />
       )}
+
+      <BDCFormSheet
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        userId={user?.uid || ""}
+      />
     </div>
   );
 }

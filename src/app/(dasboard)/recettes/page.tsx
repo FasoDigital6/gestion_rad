@@ -1,15 +1,26 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useFactures } from "@/lib/hooks/use-factures";
 import { usePaiements } from "@/lib/hooks/use-paiements";
+import { PaiementFormSheet } from "@/components/paiements/paiement-form-sheet";
+import { useAuth } from "@/lib/context/auth-context";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
+import { Plus } from "lucide-react";
 
 export default function RecettesPage() {
   const { data: factures } = useFactures();
   const { data: paiements } = usePaiements();
+  const { user } = useAuth();
+  const [isFormOpen, setIsFormOpen] = useState(false);
+
+  const handleAddPaiement = () => {
+    setIsFormOpen(true);
+  };
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("fr-FR", {
@@ -26,11 +37,17 @@ export default function RecettesPage() {
 
   return (
     <div className="flex flex-col gap-6 p-4 lg:p-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Recettes</h1>
-        <p className="text-muted-foreground">
-          Paiements reçus et à recevoir
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Recettes</h1>
+          <p className="text-muted-foreground">
+            Paiements reçus et à recevoir
+          </p>
+        </div>
+        <Button onClick={handleAddPaiement}>
+          <Plus className="mr-2 h-4 w-4" />
+          Enregistrer un paiement
+        </Button>
       </div>
 
       {/* Statistiques */}
@@ -107,6 +124,12 @@ export default function RecettesPage() {
           )}
         </CardContent>
       </Card>
+
+      <PaiementFormSheet
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        userId={user?.uid || ""}
+      />
     </div>
   );
 }

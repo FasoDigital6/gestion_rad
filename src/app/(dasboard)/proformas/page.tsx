@@ -6,9 +6,17 @@ import { columns } from "./columns";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useProformas } from "@/lib/hooks/use-proformas";
+import { ProformaFormSheet } from "@/components/proformas/proforma-form-sheet";
+import { useAuth } from "@/lib/context/auth-context";
 
 export default function ProformasPage() {
   const { data: proformas, isLoading, error } = useProformas();
+  const { user } = useAuth();
+  const [isFormOpen, setIsFormOpen] = useState(false);
+
+  const handleAddProforma = () => {
+    setIsFormOpen(true);
+  };
 
   return (
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
@@ -19,7 +27,7 @@ export default function ProformasPage() {
             Gestion des proformas et appels d'offres
           </p>
         </div>
-        <Button>
+        <Button onClick={handleAddProforma}>
           <Plus className="mr-2 h-4 w-4" />
           Nouveau proforma
         </Button>
@@ -43,6 +51,12 @@ export default function ProformasPage() {
           filterPlaceholder="Rechercher un proforma..."
         />
       )}
+
+      <ProformaFormSheet
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        userId={user?.uid || ""}
+      />
     </div>
   );
 }
