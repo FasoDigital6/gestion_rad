@@ -1,19 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+
+import { Noto_Sans } from "next/font/google";
 
 import { AuthProvider } from "@/lib/firebase/auth/auth-context";
 import { getCurrentUser } from "@/lib/server/users/users_services";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const notoSans = Noto_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -29,9 +22,7 @@ export default async function RootLayout({
   console.log(user, "user");
   return (
     <html lang="fr">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${notoSans.className}`}>
         <AuthProvider user={user}>{children}</AuthProvider>
       </body>
     </html>

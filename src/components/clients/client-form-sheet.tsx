@@ -7,34 +7,21 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { SheetFooter } from "@/components/ui/sheet";
+import { Slider } from "@/components/ui/slider";
+
 import { useCreateClient, useUpdateClient } from "@/lib/hooks/use-clients";
 import { Client } from "@/lib/types/client";
 import { Loader2 } from "lucide-react";
 
 const clientFormSchema = z.object({
   nom: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
-  email: z.string().email("Email invalide"),
-  telephone: z.string().min(8, "Le téléphone doit contenir au moins 8 chiffres"),
+  email: z.string().email("Email invalide").optional(),
+  telephone: z
+    .string()
+    .min(8, "Le téléphone doit contenir au moins 8 chiffres"),
   adresse: z.string().min(5, "L'adresse doit contenir au moins 5 caractères"),
-  ifu: z.string().optional(),
   rccm: z.string().optional(),
-  statut: z.enum(["actif", "inactif"]),
 });
 
 type ClientFormValues = z.infer<typeof clientFormSchema>;
@@ -68,13 +55,9 @@ export function ClientFormSheet({
       email: "",
       telephone: "",
       adresse: "",
-      ifu: "",
       rccm: "",
-      statut: "actif",
     },
   });
-
-  const statut = watch("statut");
 
   useEffect(() => {
     if (client) {
@@ -83,9 +66,7 @@ export function ClientFormSheet({
         email: client.email,
         telephone: client.telephone,
         adresse: client.adresse,
-        ifu: client.ifu || "",
         rccm: client.rccm || "",
-        statut: client.statut,
       });
     } else {
       reset({
@@ -93,9 +74,7 @@ export function ClientFormSheet({
         email: "",
         telephone: "",
         adresse: "",
-        ifu: "",
         rccm: "",
-        statut: "actif",
       });
     }
   }, [client, reset]);
@@ -118,21 +97,23 @@ export function ClientFormSheet({
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="sm:max-w-[540px] overflow-y-auto">
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <SheetHeader>
-            <SheetTitle>
-              {isEditing ? "Modifier le client" : "Nouveau client"}
-            </SheetTitle>
-            <SheetDescription>
-              {isEditing
-                ? "Modifiez les informations du client ci-dessous."
-                : "Remplissez les informations du nouveau client."}
-            </SheetDescription>
-          </SheetHeader>
-
-          <div className="grid gap-6 py-6">
+    <Slider
+      isOpen={open}
+      onClose={() => onOpenChange(false)}
+      title={isEditing ? "Modifier le client" : "Nouveau client"}
+      description={
+        isEditing
+          ? "Modifiez les informations du client ci-dessous."
+          : "Remplissez les informations du nouveau client."
+      }
+      size="sm:max-w-[540px]"
+    >
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col h-full overflow-hidden"
+      >
+        <div className="flex-1 overflow-y-auto py-6 px-1">
+          <div className="grid gap-6">
             <div className="grid gap-3">
               <Label htmlFor="nom">
                 Nom du client <span className="text-red-600">*</span>
@@ -144,21 +125,6 @@ export function ClientFormSheet({
               />
               {errors.nom && (
                 <p className="text-sm text-red-600">{errors.nom.message}</p>
-              )}
-            </div>
-
-            <div className="grid gap-3">
-              <Label htmlFor="email">
-                Email <span className="text-red-600">*</span>
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="contact@exemple.bf"
-                {...register("email")}
-              />
-              {errors.email && (
-                <p className="text-sm text-red-600">{errors.email.message}</p>
               )}
             </div>
 
@@ -193,14 +159,15 @@ export function ClientFormSheet({
             </div>
 
             <div className="grid gap-3">
-              <Label htmlFor="ifu">IFU (Optionnel)</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="ifu"
-                placeholder="00012345A"
-                {...register("ifu")}
+                id="email"
+                type="email"
+                placeholder="contact@exemple.bf"
+                {...register("email")}
               />
-              {errors.ifu && (
-                <p className="text-sm text-red-600">{errors.ifu.message}</p>
+              {errors.email && (
+                <p className="text-sm text-red-600">{errors.email.message}</p>
               )}
             </div>
 
@@ -215,52 +182,32 @@ export function ClientFormSheet({
                 <p className="text-sm text-red-600">{errors.rccm.message}</p>
               )}
             </div>
-
-            <div className="grid gap-3">
-              <Label htmlFor="statut">
-                Statut <span className="text-red-600">*</span>
-              </Label>
-              <Select
-                value={statut}
-                onValueChange={(value) =>
-                  setValue("statut", value as "actif" | "inactif")
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionnez un statut" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="actif">Actif</SelectItem>
-                  <SelectItem value="inactif">Inactif</SelectItem>
-                </SelectContent>
-              </Select>
-              {errors.statut && (
-                <p className="text-sm text-red-600">{errors.statut.message}</p>
-              )}
-            </div>
           </div>
+        </div>
 
-          <SheetFooter>
-            <SheetClose asChild>
-              <Button type="button" variant="outline" disabled={isSubmitting}>
-                Annuler
-              </Button>
-            </SheetClose>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Enregistrement...
-                </>
-              ) : isEditing ? (
-                "Mettre à jour"
-              ) : (
-                "Créer le client"
-              )}
-            </Button>
-          </SheetFooter>
-        </form>
-      </SheetContent>
-    </Sheet>
+        <SheetFooter className="py-4 mt-auto">
+          <Button
+            type="button"
+            variant="outline"
+            disabled={isSubmitting}
+            onClick={() => onOpenChange(false)}
+          >
+            Annuler
+          </Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Enregistrement...
+              </>
+            ) : isEditing ? (
+              "Mettre à jour"
+            ) : (
+              "Créer le client"
+            )}
+          </Button>
+        </SheetFooter>
+      </form>
+    </Slider>
   );
 }

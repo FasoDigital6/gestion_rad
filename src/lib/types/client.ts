@@ -4,13 +4,11 @@
 export type Client = {
   id: string;
   nom: string;
-  email: string;
+  email?: string;
   telephone: string;
   adresse: string;
-  ifu?: string; // Identifiant Fiscal Unique (optionnel)
   rccm?: string; // Registre de Commerce et du Crédit Mobilier (optionnel)
   dateCreation: Date;
-  statut: "actif" | "inactif";
 
   // Statistiques financières du client (selon section 3 du cahier des charges)
   totalLivre: number; // Total des montants livrés
@@ -24,7 +22,12 @@ export type Client = {
  */
 export type CreateClientInput = Omit<
   Client,
-  "id" | "dateCreation" | "totalLivre" | "totalFacture" | "totalPaye" | "totalDu"
+  | "id"
+  | "dateCreation"
+  | "totalLivre"
+  | "totalFacture"
+  | "totalPaye"
+  | "totalDu"
 >;
 
 /**

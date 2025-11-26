@@ -13,7 +13,11 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/client/config";
 import { CLIENTS_COLLECTION_NAME } from "@/lib/firebase/collections_name";
-import { Client, CreateClientInput, UpdateClientInput } from "@/lib/types/client";
+import {
+  Client,
+  CreateClientInput,
+  UpdateClientInput,
+} from "@/lib/types/client";
 
 /**
  * Récupérer tous les clients
@@ -33,10 +37,8 @@ export async function getClients(): Promise<Client[]> {
         email: data.email,
         telephone: data.telephone,
         adresse: data.adresse,
-        ifu: data.ifu,
         rccm: data.rccm,
         dateCreation: data.dateCreation?.toDate() || new Date(),
-        statut: data.statut,
         totalLivre: data.totalLivre || 0,
         totalFacture: data.totalFacture || 0,
         totalPaye: data.totalPaye || 0,
@@ -70,10 +72,8 @@ export async function getClient(id: string): Promise<Client> {
       email: data.email,
       telephone: data.telephone,
       adresse: data.adresse,
-      ifu: data.ifu,
       rccm: data.rccm,
       dateCreation: data.dateCreation?.toDate() || new Date(),
-      statut: data.statut,
       totalLivre: data.totalLivre || 0,
       totalFacture: data.totalFacture || 0,
       totalPaye: data.totalPaye || 0,

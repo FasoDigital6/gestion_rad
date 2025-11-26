@@ -17,9 +17,7 @@ export function createColumns(
         return (
           <Button
             variant="ghost"
-            onClick={() =>
-              column.toggleSorting(column.getIsSorted() === "asc")
-            }
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Nom du client
             <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -44,9 +42,7 @@ export function createColumns(
         return (
           <Button
             variant="ghost"
-            onClick={() =>
-              column.toggleSorting(column.getIsSorted() === "asc")
-            }
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Email
             <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -64,24 +60,7 @@ export function createColumns(
         return <div>{row.getValue("telephone")}</div>;
       },
     },
-    {
-      accessorKey: "statut",
-      header: "Statut",
-      cell: ({ row }) => {
-        const statut = row.getValue("statut") as string;
-        return (
-          <div
-            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-              statut === "actif"
-                ? "bg-green-100 text-green-800"
-                : "bg-gray-100 text-gray-800"
-            }`}
-          >
-            {statut === "actif" ? "Actif" : "Inactif"}
-          </div>
-        );
-      },
-    },
+
     {
       accessorKey: "totalDu",
       header: () => <div className="text-right">Total Dû</div>,
