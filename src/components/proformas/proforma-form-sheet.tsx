@@ -7,15 +7,8 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import { SheetFooter } from "@/components/ui/sheet";
+import { Slider } from "@/components/ui/slider";
 import {
   Select,
   SelectContent,
@@ -166,21 +159,21 @@ export function ProformaFormSheet({
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="sm:max-w-[1000px] overflow-y-auto">
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <SheetHeader>
-            <SheetTitle className="text-2xl">
-              {isEditing ? "Modifier le proforma" : "Créer un proforma"}
-            </SheetTitle>
-            <SheetDescription>
-              {isEditing
-                ? "Modifiez les informations du devis"
-                : "Remplissez les informations du devis"}
-            </SheetDescription>
-          </SheetHeader>
-
-          <div className="space-y-6 py-6">
+    <Slider
+      isOpen={open}
+      onClose={() => onOpenChange(false)}
+      title={isEditing ? "Modifier le proforma" : "Créer un proforma"}
+      description={
+        isEditing
+          ? "Modifiez les informations du devis"
+          : "Remplissez les informations du devis"
+      }
+      size="sm:max-w-[1000px]"
+      side="right"
+    >
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col h-full overflow-hidden">
+        <div className="flex-1 overflow-y-auto py-6 px-1">
+          <div className="space-y-6">
             {/* Section Informations client */}
             <Card>
               <CardHeader>
@@ -408,33 +401,33 @@ export function ProformaFormSheet({
               </CardContent>
             </Card>
           </div>
+        </div>
 
-          <SheetFooter className="gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isSubmitting}
-            >
-              Annuler
-            </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Enregistrement...
-                </>
-              ) : (
-                "Enregistrer"
-              )}
-            </Button>
-          </SheetFooter>
-        </form>
-      </SheetContent>
-    </Sheet>
+        <SheetFooter className="py-4 mt-auto gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isSubmitting}
+          >
+            Annuler
+          </Button>
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Enregistrement...
+              </>
+            ) : (
+              "Enregistrer"
+            )}
+          </Button>
+        </SheetFooter>
+      </form>
+    </Slider>
   );
 }

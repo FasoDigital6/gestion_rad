@@ -13,17 +13,22 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { pdf } from "@react-pdf/renderer";
 import { ProformaPDFTemplate } from "@/components/proformas/proforma-pdf-template";
+import { ProformaFormSheet } from "@/components/proformas/proforma-form-sheet";
+import { Proforma } from "@/lib/types/proforma";
 
 export default function ProformasPage() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<"all" | "BROUILLON" | "ENVOYE" | "VALIDE">("all");
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [selectedProforma, setSelectedProforma] = useState<Proforma | null>(null);
 
   const { data: proformas, isLoading, error } = useProformas();
   const { data: clients } = useClients();
 
   const handleAddProforma = () => {
-    router.push("/proformas/nouveau");
+    setSelectedProforma(null);
+    setIsFormOpen(true);
   };
 
   const handleDownloadPDF = async (proforma: any) => {
@@ -353,6 +358,11 @@ Réseau Africain de Développement (RAD)`;
         </CardContent>
       </Card>
 
+      <ProformaFormSheet
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        proforma={selectedProforma}
+      />
     </div>
   );
 }
