@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -9,24 +9,35 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SheetFooter } from "@/components/ui/sheet";
 import { Slider } from "@/components/ui/slider";
+import { DatePicker } from "@/components/ui/date-picker";
+import SimpleSelect, {
+  Option,
+  SimpleSelectWithAddButton,
+} from "@/components/react-select/simple-select";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useCreateProforma, useUpdateProforma } from "@/lib/hooks/use-proformas";
+  useCreateProforma,
+  useUpdateProforma,
+} from "@/lib/hooks/use-proformas";
 import { useClients } from "@/lib/hooks/use-clients";
 import { Proforma } from "@/lib/types/proforma";
 import { Loader2, Plus, Trash2 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { RiUserAddLine } from "react-icons/ri";
+import { ClientFormSheet } from "@/components/clients/client-form-sheet";
 
 // Schéma de validation avec Zod
 const proformaFormSchema = z.object({
-  numeroDA: z.string().min(3, "Le numéro DA doit contenir au moins 3 caractères"),
+  numeroDA: z
+    .string()
+    .min(3, "Le numéro DA doit contenir au moins 3 caractères"),
   clientId: z.string().min(1, "Veuillez sélectionner un client"),
-  dateLivraison: z.string().min(5, "Veuillez indiquer la date de livraison"),
+  dateLivraison: z.string().min(1, "Veuillez indiquer la date de livraison"),
   lignes: z
     .array(
       z.object({
@@ -57,15 +68,17 @@ export function ProformaFormSheet({
   const createMutation = useCreateProforma();
   const updateMutation = useUpdateProforma();
   const { data: clients } = useClients();
+  const [date, setDate] = useState<Date>(new Date());
+  const [isClientFormOpen, setIsClientFormOpen] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-    setValue,
     watch,
     control,
+    setValue,
   } = useForm<ProformaFormValues>({
     resolver: zodResolver(proformaFormSchema),
     defaultValues: {
@@ -92,6 +105,13 @@ export function ProformaFormSheet({
   const lignes = watch("lignes");
   const remisePourcentage = watch("remisePourcentage") || 0;
   const clientId = watch("clientId");
+
+  // Convertir les clients en options pour SimpleSelect
+  const clientOptions: Option[] =
+    clients?.map((client) => ({
+      label: client.nom,
+      value: client.id,
+    })) || [];
 
   // Calcul des totaux
   const total = lignes.reduce(
@@ -171,7 +191,10 @@ export function ProformaFormSheet({
       size="sm:max-w-[1000px]"
       side="right"
     >
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col h-full overflow-hidden">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col h-full overflow-hidden"
+      >
         <div className="flex-1 overflow-y-auto py-6 px-1">
           <div className="space-y-6">
             {/* Section Informations client */}
@@ -187,31 +210,48 @@ export function ProformaFormSheet({
                   {/* Client */}
                   <div className="space-y-2">
                     <Label htmlFor="clientId">Client</Label>
-                    <Select value={clientId} onValueChange={(value) => setValue("clientId", value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner un client" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {clients?.map((client) => (
-                          <SelectItem key={client.id} value={client.id}>
-                            {client.nom}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Controller
+                      name="clientId"
+                      control={control}
+                      render={({ field }) => (
+                        <SimpleSelectWithAddButton
+                          field={{
+                            ...field,
+                            value:
+                              clientOptions.find(
+                                (opt) => opt.value === field.value
+                              ) || null,
+                            onChange: (selected) =>
+                              field.onChange(
+                                selected ? (selected as Option).value : ""
+                              ),
+                          }}
+                          placeholder="Sélectionner un client"
+                          options={clientOptions}
+                          addButtonIcon={
+                            <RiUserAddLine className="mr-2 h-4 w-4" />
+                          }
+                          addButtonLabel="Ajouter un client"
+                          onAddButtonClick={() => {
+                            setIsClientFormOpen(true);
+                          }}
+                        />
+                      )}
+                    />
                     {errors.clientId && (
-                      <p className="text-sm text-red-600">{errors.clientId.message}</p>
+                      <p className="text-sm text-red-600">
+                        {errors.clientId.message}
+                      </p>
                     )}
                   </div>
 
                   {/* Date */}
                   <div className="space-y-2">
                     <Label htmlFor="date">Date</Label>
-                    <Input
-                      type="date"
-                      value={new Date().toISOString().split("T")[0]}
-                      readOnly
-                      className="bg-gray-50"
+                    <DatePicker
+                      date={date}
+                      onDateChange={(newDate) => newDate && setDate(newDate)}
+                      placeholder="Sélectionner une date"
                     />
                   </div>
                 </div>
@@ -226,13 +266,17 @@ export function ProformaFormSheet({
                       {...register("numeroDA")}
                     />
                     {errors.numeroDA && (
-                      <p className="text-sm text-red-600">{errors.numeroDA.message}</p>
+                      <p className="text-sm text-red-600">
+                        {errors.numeroDA.message}
+                      </p>
                     )}
                   </div>
 
                   {/* Date de livraison (Validité en jours) */}
                   <div className="space-y-2">
-                    <Label htmlFor="dateLivraison">Délai de livraison (jours)</Label>
+                    <Label htmlFor="dateLivraison">
+                      Délai de livraison (jours)
+                    </Label>
                     <Input
                       id="dateLivraison"
                       type="number"
@@ -240,7 +284,9 @@ export function ProformaFormSheet({
                       {...register("dateLivraison")}
                     />
                     {errors.dateLivraison && (
-                      <p className="text-sm text-red-600">{errors.dateLivraison.message}</p>
+                      <p className="text-sm text-red-600">
+                        {errors.dateLivraison.message}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -252,8 +298,12 @@ export function ProformaFormSheet({
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-base">Articles et prestations</CardTitle>
-                    <CardDescription>Ajoutez les lignes de votre proforma</CardDescription>
+                    <CardTitle className="text-base">
+                      Articles et prestations
+                    </CardTitle>
+                    <CardDescription>
+                      Ajoutez les lignes de votre proforma
+                    </CardDescription>
                   </div>
                   <Button
                     type="button"
@@ -371,7 +421,9 @@ export function ProformaFormSheet({
                 <div className="border-t bg-gray-50 px-4 py-4 space-y-2">
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-gray-600">Sous-total HT</span>
-                    <span className="font-medium">{total.toLocaleString("fr-FR")} GNF</span>
+                    <span className="font-medium">
+                      {total.toLocaleString("fr-FR")} GNF
+                    </span>
                   </div>
 
                   <div className="flex justify-between items-center text-sm">
@@ -390,7 +442,9 @@ export function ProformaFormSheet({
                       />
                       <span className="text-gray-600">%</span>
                     </div>
-                    <span className="font-medium">{remiseMontant.toLocaleString("fr-FR")} GNF</span>
+                    <span className="font-medium">
+                      {remiseMontant.toLocaleString("fr-FR")} GNF
+                    </span>
                   </div>
 
                   <div className="flex justify-between items-center text-base font-bold pt-2 border-t">
@@ -428,6 +482,15 @@ export function ProformaFormSheet({
           </Button>
         </SheetFooter>
       </form>
+
+      <ClientFormSheet
+        open={isClientFormOpen}
+        onOpenChange={setIsClientFormOpen}
+        client={null}
+        onClientCreated={(clientId) => {
+          setValue("clientId", clientId);
+        }}
+      />
     </Slider>
   );
 }

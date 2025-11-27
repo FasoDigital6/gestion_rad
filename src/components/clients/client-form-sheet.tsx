@@ -30,12 +30,14 @@ interface ClientFormSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   client?: Client | null;
+  onClientCreated?: (clientId: string) => void;
 }
 
 export function ClientFormSheet({
   open,
   onOpenChange,
   client,
+  onClientCreated,
 }: ClientFormSheetProps) {
   const isEditing = !!client;
   const createMutation = useCreateClient();
@@ -87,7 +89,10 @@ export function ClientFormSheet({
           ...data,
         });
       } else {
-        await createMutation.mutateAsync(data);
+        const clientId = await createMutation.mutateAsync(data);
+        if (onClientCreated && clientId) {
+          onClientCreated(clientId);
+        }
       }
       onOpenChange(false);
       reset();
