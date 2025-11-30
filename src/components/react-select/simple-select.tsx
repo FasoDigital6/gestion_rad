@@ -75,27 +75,27 @@ const placeholderStyles = "";
 const selectInputStyles = "";
 const valueContainerStyles = "px-1  gap-1";
 const singleValueStyles = " ml-1";
-const multiValueStyles = "bg-gray-100 rounded items-center p-0";
+const multiValueStyles = "bg-muted rounded items-center p-0";
 const multiValueLabelStyles = "px-0.5";
 const multiValueRemoveStyles =
-  "border border-gray-200 bg-white hover:bg-red-50 hover:text-red-800 text-muted-foreground hover:border-red-300 rounded-md";
+  "border border-border bg-background hover:bg-destructive/10 hover:text-destructive text-muted-foreground hover:border-destructive/50 rounded-md";
 const indicatorsContainerStyles = "px-1 gap-2";
 const clearIndicatorStyles =
-  "text-muted-foreground px-1 rounded-md hover:bg-red-50 hover:text-red-800";
-const indicatorSeparatorStyles = "bg-gray-300";
+  "text-muted-foreground px-1 rounded-md hover:bg-destructive/10 hover:text-destructive";
+const indicatorSeparatorStyles = "bg-border";
 const dropdownIndicatorStyles =
-  "px-1 hover:bg-gray-100 text-muted-foreground rounded-md hover:text-black";
+  "px-1 hover:bg-muted text-muted-foreground rounded-md hover:text-foreground";
 const menuStyles =
-  "p-1 text-sm mt-2 border scrollbar-hide shadow-md border-gray-200 bg-white rounded-lg";
+  "p-1 text-sm mt-2 border scrollbar-hide shadow-md border-border bg-popover rounded-lg";
 const groupHeadingStyles = "ml-3 mt-2 mb-1 text-muted-foreground text-sm";
 const optionStyles = {
   base: "hover:cursor-pointer pl-8 py-2  rounded text-[10px]",
-  focus: "bg-gray-100 active:bg-muted-foreground",
+  focus: "bg-muted active:bg-muted",
   selected:
-    "before:content-['✔'] before:ml-2 before:text-green-500 text-muted-foreground",
+    "before:content-['✔'] before:ml-2 before:text-success text-muted-foreground",
 };
 const noOptionsMessageStyles =
-  "text-muted-foreground p-2 bg-gray-50 border border-dashed border-gray-200 rounded-lg";
+  "text-muted-foreground p-2 bg-muted border border-dashed border-border rounded-lg";
 
 const SimpleSelect = ({
   field,
@@ -198,8 +198,8 @@ export const SimpleSelectWithAddButton = ({
     <div className="flex flex-col">
       <div className="flex-grow">{props.children}</div>
       <div
-        className="px-3 py-2 text-sm text-primary cursor-pointer hover:bg-slate-100 flex
-          items-center border-t"
+        className="px-3 py-2 text-sm text-brand cursor-pointer hover:bg-muted flex
+          items-center border-t border-border"
         onClick={() => {
           if (document.activeElement instanceof HTMLElement) {
             document.activeElement.blur();

@@ -119,10 +119,10 @@ Réseau Africain de Développement (RAD)`;
     <div className="flex flex-col gap-6 p-6 lg:p-8">
       {/* Header */}
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
           Gestion des proformas
         </h1>
-        <p className="text-base text-gray-500">
+        <p className="text-base text-muted-foreground">
           Créez et gérez vos devis et proformas
         </p>
       </div>
@@ -132,19 +132,19 @@ Réseau Africain de Développement (RAD)`;
         <Card
           className={`border cursor-pointer transition-all ${
             filterStatus === "BROUILLON"
-              ? "border-gray-400 shadow-md"
-              : "border-gray-200 hover:border-gray-300"
+              ? "border-ring shadow-md"
+              : "border-border hover:border-ring/50"
           }`}
           onClick={() => setFilterStatus(filterStatus === "BROUILLON" ? "all" : "BROUILLON")}
         >
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Brouillons</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{stats.brouillons}</p>
+                <p className="text-sm font-medium text-muted-foreground">Brouillons</p>
+                <p className="text-3xl font-bold text-foreground mt-2">{stats.brouillons}</p>
               </div>
-              <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center">
-                <FileText className="h-6 w-6 text-gray-600" />
+              <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
+                <FileText className="h-6 w-6 text-muted-foreground" />
               </div>
             </div>
           </CardContent>
@@ -153,19 +153,19 @@ Réseau Africain de Développement (RAD)`;
         <Card
           className={`border cursor-pointer transition-all ${
             filterStatus === "ENVOYE"
-              ? "border-blue-400 shadow-md"
-              : "border-gray-200 hover:border-gray-300"
+              ? "border-brand/80 shadow-md"
+              : "border-border hover:border-ring/50"
           }`}
           onClick={() => setFilterStatus(filterStatus === "ENVOYE" ? "all" : "ENVOYE")}
         >
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Envoyés</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{stats.envoyes}</p>
+                <p className="text-sm font-medium text-muted-foreground">Envoyés</p>
+                <p className="text-3xl font-bold text-foreground mt-2">{stats.envoyes}</p>
               </div>
-              <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                <Send className="h-6 w-6 text-blue-600" />
+              <div className="h-12 w-12 rounded-full bg-brand/10 flex items-center justify-center">
+                <Send className="h-6 w-6 text-brand" />
               </div>
             </div>
           </CardContent>
@@ -174,19 +174,19 @@ Réseau Africain de Développement (RAD)`;
         <Card
           className={`border cursor-pointer transition-all ${
             filterStatus === "VALIDE"
-              ? "border-green-400 shadow-md"
-              : "border-gray-200 hover:border-gray-300"
+              ? "border-success/80 shadow-md"
+              : "border-border hover:border-ring/50"
           }`}
           onClick={() => setFilterStatus(filterStatus === "VALIDE" ? "all" : "VALIDE")}
         >
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Validés</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{stats.valides}</p>
+                <p className="text-sm font-medium text-muted-foreground">Validés</p>
+                <p className="text-3xl font-bold text-foreground mt-2">{stats.valides}</p>
               </div>
-              <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
-                <CheckCircle className="h-6 w-6 text-green-600" />
+              <div className="h-12 w-12 rounded-full bg-success/10 flex items-center justify-center">
+                <CheckCircle className="h-6 w-6 text-success" />
               </div>
             </div>
           </CardContent>
@@ -196,7 +196,7 @@ Réseau Africain de Développement (RAD)`;
       {/* Search and Filter Bar */}
       <div className="flex items-center justify-between gap-4">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             type="text"
             placeholder="Rechercher un proforma..."
@@ -211,7 +211,7 @@ Réseau Africain de Développement (RAD)`;
             <Filter className="h-4 w-4" />
             Tous les statuts
           </Button>
-          <Button onClick={handleAddProforma} className="gap-2 bg-blue-600 hover:bg-blue-700">
+          <Button onClick={handleAddProforma} className="gap-2 bg-brand text-brand-foreground hover:bg-brand/90">
             <Plus className="h-4 w-4" />
             Nouveau proforma
           </Button>
@@ -222,70 +222,70 @@ Réseau Africain de Développement (RAD)`;
       <Card className="border-border">
         <CardContent className="p-0">
           <div className="px-6 py-4 border-b border-border">
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-foreground">
               Liste des proformas
             </h2>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               {filteredProformas?.length || 0} proforma(s) au total
             </p>
           </div>
 
           {isLoading ? (
             <div className="flex items-center justify-center h-64">
-              <div className="text-gray-500">Chargement...</div>
+              <div className="text-muted-foreground">Chargement...</div>
             </div>
           ) : error ? (
             <div className="flex items-center justify-center h-64">
-              <div className="text-red-600">Erreur lors du chargement des proformas</div>
+              <div className="text-destructive">Erreur lors du chargement des proformas</div>
             </div>
           ) : filteredProformas && filteredProformas.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-border bg-gray-50/50">
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <tr className="border-b border-border bg-muted/50">
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                       Numéro
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                       Client
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                       Date
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                       Montant
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                       Statut
                     </th>
-                    <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border bg-white">
+                <tbody className="divide-y divide-border bg-background">
                   {filteredProformas.map((proforma) => (
                     <tr
                       key={proforma.id}
-                      className="hover:bg-gray-50 transition-colors"
+                      className="hover:bg-muted transition-colors"
                     >
                       <td className="px-6 py-4">
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="text-sm font-medium text-foreground">
                           {proforma.numero}
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-sm text-gray-900 max-w-[200px] truncate">
+                        <div className="text-sm text-foreground max-w-[200px] truncate">
                           {proforma.clientNom}
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm text-muted-foreground">
                           {format(proforma.dateCreation, "dd/MM/yyyy", { locale: fr })}
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="text-sm font-medium text-foreground">
                           {proforma.totalNet.toLocaleString("fr-FR")} GNF
                         </div>
                       </td>
@@ -293,12 +293,12 @@ Réseau Africain de Développement (RAD)`;
                         <span
                           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                             proforma.statut === "BROUILLON"
-                              ? "bg-gray-100 text-gray-800"
+                              ? "bg-muted text-muted-foreground"
                               : proforma.statut === "ENVOYE"
-                              ? "bg-blue-100 text-blue-800"
+                              ? "bg-brand/10 text-brand"
                               : proforma.statut === "VALIDE"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
+                              ? "bg-success/10 text-success"
+                              : "bg-destructive/10 text-destructive"
                           }`}
                         >
                           {proforma.statut === "BROUILLON"
@@ -316,7 +316,7 @@ Réseau Africain de Développement (RAD)`;
                             variant="ghost"
                             size="sm"
                             onClick={() => handleDownloadPDF(proforma)}
-                            className="text-gray-600 hover:text-gray-900"
+                            className="text-muted-foreground hover:text-foreground"
                             title="Télécharger PDF"
                           >
                             <Download className="h-4 w-4" />
@@ -325,7 +325,7 @@ Réseau Africain de Développement (RAD)`;
                             variant="ghost"
                             size="sm"
                             onClick={() => handleSendEmail(proforma)}
-                            className="text-gray-600 hover:text-gray-900"
+                            className="text-muted-foreground hover:text-foreground"
                             title="Envoyer par email"
                           >
                             <Mail className="h-4 w-4" />
@@ -334,7 +334,7 @@ Réseau Africain de Développement (RAD)`;
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                              className="text-brand hover:text-brand hover:bg-brand/10"
                             >
                               Voir détails
                             </Button>
@@ -347,10 +347,10 @@ Réseau Africain de Développement (RAD)`;
               </table>
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center h-64 text-gray-500">
-              <FileText className="h-12 w-12 mb-4 text-gray-300" />
+            <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
+              <FileText className="h-12 w-12 mb-4 opacity-20" />
               <p className="text-lg font-medium">Aucun proforma trouvé</p>
-              <p className="text-sm text-gray-400 mt-1">
+              <p className="text-sm opacity-70 mt-1">
                 Commencez par créer votre premier proforma
               </p>
             </div>

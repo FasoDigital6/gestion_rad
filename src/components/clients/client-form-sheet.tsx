@@ -6,9 +6,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { SheetFooter } from "@/components/ui/sheet";
 import { Slider } from "@/components/ui/slider";
+import {
+  Field,
+  FieldLabel,
+  FieldError,
+} from "@/components/ui/field";
 
 import { useCreateClient, useUpdateClient } from "@/lib/hooks/use-clients";
 import { Client } from "@/lib/types/client";
@@ -117,89 +121,97 @@ export function ClientFormSheet({
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col h-full overflow-hidden"
       >
-        <div className="flex-1 overflow-y-auto py-6 px-1">
+        <div className="flex-1 overflow-y-auto py-6 px-6">
           <div className="grid gap-6">
-            <div className="grid gap-3">
-              <Label htmlFor="nom">
-                Nom du client <span className="text-red-600">*</span>
-              </Label>
+            <Field data-invalid={!!errors.nom} className="space-y-2">
+              <FieldLabel htmlFor="nom">
+                Nom du client <span className="text-destructive">*</span>
+              </FieldLabel>
               <Input
                 id="nom"
                 placeholder="Ex: SAG Burkina"
                 {...register("nom")}
+                aria-invalid={!!errors.nom}
               />
               {errors.nom && (
-                <p className="text-sm text-red-600">{errors.nom.message}</p>
+                <FieldError errors={[errors.nom]} />
               )}
-            </div>
+            </Field>
 
-            <div className="grid gap-3">
-              <Label htmlFor="telephone">
-                Téléphone <span className="text-red-600">*</span>
-              </Label>
+            <Field data-invalid={!!errors.telephone} className="space-y-2">
+              <FieldLabel htmlFor="telephone">
+                Téléphone <span className="text-destructive">*</span>
+              </FieldLabel>
               <Input
                 id="telephone"
                 placeholder="+226 25 30 30 30"
                 {...register("telephone")}
+                aria-invalid={!!errors.telephone}
               />
               {errors.telephone && (
-                <p className="text-sm text-red-600">
-                  {errors.telephone.message}
-                </p>
+                <FieldError errors={[errors.telephone]} />
               )}
-            </div>
+            </Field>
 
-            <div className="grid gap-3">
-              <Label htmlFor="adresse">
-                Adresse <span className="text-red-600">*</span>
-              </Label>
+            <Field data-invalid={!!errors.adresse} className="space-y-2">
+              <FieldLabel htmlFor="adresse">
+                Adresse <span className="text-destructive">*</span>
+              </FieldLabel>
               <Input
                 id="adresse"
                 placeholder="Ouagadougou, Burkina Faso"
                 {...register("adresse")}
+                aria-invalid={!!errors.adresse}
               />
               {errors.adresse && (
-                <p className="text-sm text-red-600">{errors.adresse.message}</p>
+                <FieldError errors={[errors.adresse]} />
               )}
-            </div>
+            </Field>
 
-            <div className="grid gap-3">
-              <Label htmlFor="email">Email</Label>
+            <Field data-invalid={!!errors.email} className="space-y-2">
+              <FieldLabel htmlFor="email">Email</FieldLabel>
               <Input
                 id="email"
                 type="email"
                 placeholder="contact@exemple.bf"
                 {...register("email")}
+                aria-invalid={!!errors.email}
               />
               {errors.email && (
-                <p className="text-sm text-red-600">{errors.email.message}</p>
+                <FieldError errors={[errors.email]} />
               )}
-            </div>
+            </Field>
 
-            <div className="grid gap-3">
-              <Label htmlFor="rccm">RCCM (Optionnel)</Label>
+            <Field data-invalid={!!errors.rccm} className="space-y-2">
+              <FieldLabel htmlFor="rccm">RCCM (Optionnel)</FieldLabel>
               <Input
                 id="rccm"
                 placeholder="BF-OUA-01-2020-B12-00001"
                 {...register("rccm")}
+                aria-invalid={!!errors.rccm}
               />
               {errors.rccm && (
-                <p className="text-sm text-red-600">{errors.rccm.message}</p>
+                <FieldError errors={[errors.rccm]} />
               )}
-            </div>
+            </Field>
           </div>
         </div>
 
-        <SheetFooter className="py-4 mt-auto">
+        <SheetFooter className="py-5 px-6 border-t border-border bg-background gap-3 flex-row justify-end">
           <Button
             type="button"
             variant="outline"
             disabled={isSubmitting}
             onClick={() => onOpenChange(false)}
+            className="h-11 px-6 min-w-[120px]"
           >
             Annuler
           </Button>
-          <Button type="submit" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="h-11 px-8 bg-brand text-brand-foreground hover:bg-brand/90 shadow-lg shadow-brand/25 hover:shadow-xl hover:shadow-brand/30 transition-all min-w-[180px]"
+          >
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -22,7 +22,7 @@ export type ProformaLigne = {
 export type Proforma = {
   id: string;
   numero: string; // Format: "009/RAD/2025"
-  numeroDA: string; // Numéro d'appel d'offres (ex: "DA2507SIM099")
+  numeroDA?: string; // Numéro d'appel d'offres (ex: "DA2507SIM099")
   clientId: string;
   clientNom: string; // Dénormalisé pour performance (ex: "PROJET SIMANDOU")
 
@@ -52,7 +52,7 @@ export type Proforma = {
  * Type pour la création d'un nouveau proforma
  */
 export type CreateProformaInput = {
-  numeroDA: string;
+  numeroDA?: string;
   clientId: string;
   clientNom: string;
   dateLivraison: string;
