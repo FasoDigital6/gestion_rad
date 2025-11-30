@@ -32,6 +32,9 @@ export type Bdl = {
   bdcId: string;
   bdcNumero: string;
 
+  // Référence à la facture (optionnel - rempli quand le BDL est facturé)
+  factureId?: string;
+
   // Informations client (dénormalisées depuis le BDC)
   clientId: string;
   clientNom: string; // Dénormalisé pour performance

@@ -8,11 +8,15 @@ import {
   getDoc,
   query,
   orderBy,
+  where,
   Timestamp,
   serverTimestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/client/config";
-import { CLIENTS_COLLECTION_NAME } from "@/lib/firebase/collections_name";
+import {
+  CLIENTS_COLLECTION_NAME,
+  FACTURES_COLLECTION_NAME,
+} from "@/lib/firebase/collections_name";
 import {
   Client,
   CreateClientInput,
@@ -151,5 +155,45 @@ export async function toggleClientStatus(
   } catch (error) {
     console.error("Erreur lors du changement de statut:", error);
     throw new Error("Impossible de changer le statut du client");
+  }
+}
+
+/**
+ * Recalculer tous les totaux d'un client depuis les factures
+ * Appelé automatiquement lors émission facture ou ajout paiement
+ * Peut aussi être appelé manuellement pour correction
+ */
+export async function recalculateClientTotals(clientId: string): Promise<void> {
+  try {
+    // Récupérer toutes les factures EMISES, PAYEE_PARTIELLE, PAYEE du client
+    const facturesRef = collection(db, FACTURES_COLLECTION_NAME);
+    const q = query(
+      facturesRef,
+      where("clientId", "==", clientId),
+      where("statut", "in", ["EMISE", "PAYEE_PARTIELLE", "PAYEE"])
+    );
+    const querySnapshot = await getDocs(q);
+
+    let totalFacture = 0;
+    let totalPaye = 0;
+
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      totalFacture += data.totalNet || 0;
+      totalPaye += data.totalPaye || 0;
+    });
+
+    const totalDu = totalFacture - totalPaye;
+
+    // Mettre à jour le client
+    const clientDoc = doc(db, CLIENTS_COLLECTION_NAME, clientId);
+    await updateDoc(clientDoc, {
+      totalFacture,
+      totalPaye,
+      totalDu,
+    });
+  } catch (error) {
+    console.error("Erreur lors du recalcul des totaux du client:", error);
+    throw new Error("Impossible de recalculer les totaux du client");
   }
 }
