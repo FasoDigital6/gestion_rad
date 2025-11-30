@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, Filter, FileText, Send, CheckCircle, Download, Mail } from "lucide-react";
+import { Plus, Search, Filter, FileText, Send, CheckCircle, Download, Mail, Edit } from "lucide-react";
 import { useProformas } from "@/lib/hooks/use-proformas";
 import { useClients } from "@/lib/hooks/use-clients";
 import { Card, CardContent } from "@/components/ui/card";
@@ -28,6 +28,11 @@ export default function ProformasPage() {
 
   const handleAddProforma = () => {
     setSelectedProforma(null);
+    setIsFormOpen(true);
+  };
+
+  const handleEditProforma = (proforma: Proforma) => {
+    setSelectedProforma(proforma);
     setIsFormOpen(true);
   };
 
@@ -312,6 +317,17 @@ Réseau Africain de Développement (RAD)`;
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">
+                          {proforma.statut === "BROUILLON" && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditProforma(proforma)}
+                              className="text-muted-foreground hover:text-brand hover:bg-brand/10"
+                              title="Modifier"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          )}
                           <Button
                             variant="ghost"
                             size="sm"

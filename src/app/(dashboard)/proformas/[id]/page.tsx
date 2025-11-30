@@ -6,7 +6,6 @@ import { useClients } from "@/lib/hooks/use-clients";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-  Edit,
   Download,
   Send,
   ShoppingCart,
@@ -148,16 +147,6 @@ Réseau Africain de Développement (RAD)`;
         </div>
 
         <div className="flex items-center gap-2">
-          {proforma.statut === "BROUILLON" && (
-            <Button
-              variant="outline"
-              className="gap-2"
-              onClick={() => router.push(`/proformas/${id}/modifier`)}
-            >
-              <Edit className="h-4 w-4" />
-              Modifier
-            </Button>
-          )}
           <Button
             variant="outline"
             className="gap-2"
