@@ -3,6 +3,7 @@
 import { use } from "react";
 import { useProforma } from "@/lib/hooks/use-proformas";
 import { useClients } from "@/lib/hooks/use-clients";
+import { useCreateBdcFromProforma } from "@/lib/hooks/use-bdc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -16,6 +17,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { pdf } from "@react-pdf/renderer";
 import { ProformaPDFTemplate } from "@/components/proformas/proforma-pdf-template";
+import { ProformaActions } from "@/components/proformas/proforma-actions";
 
 export default function ProformaDetailsPage({
   params,
@@ -26,6 +28,7 @@ export default function ProformaDetailsPage({
   const router = useRouter();
   const { data: proforma, isLoading, error } = useProforma(id);
   const { data: clients } = useClients();
+  const createBdcMutation = useCreateBdcFromProforma();
 
   const handleDownloadPDF = async () => {
     if (!proforma) return;
@@ -92,8 +95,19 @@ Réseau Africain de Développement (RAD)`;
     }
   };
 
-  const handleGenerateBDC = () => {
-    alert("Génération du BDC à implémenter");
+  const handleGenerateBDC = async () => {
+    if (!proforma || proforma.statut !== "VALIDE") {
+      alert("Seuls les proformas validés peuvent générer un BDC");
+      return;
+    }
+
+    try {
+      const bdcId = await createBdcMutation.mutateAsync(proforma.id);
+      router.push(`/bdc/${bdcId}`);
+    } catch (error) {
+      console.error("Erreur:", error);
+      alert("Erreur lors de la génération du BDC");
+    }
   };
 
   if (isLoading) {
@@ -147,6 +161,15 @@ Réseau Africain de Développement (RAD)`;
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Boutons de changement de statut */}
+          <ProformaActions proforma={proforma} variant="buttons" />
+
+          {/* Séparateur si des boutons de statut sont affichés */}
+          {(proforma.statut === "BROUILLON" || proforma.statut === "ENVOYE") && (
+            <div className="h-6 w-px bg-border" />
+          )}
+
+          {/* Boutons d'actions */}
           <Button
             variant="outline"
             className="gap-2"
@@ -163,9 +186,14 @@ Réseau Africain de Développement (RAD)`;
             <Button
               className="gap-2 bg-blue-600 hover:bg-blue-700"
               onClick={handleGenerateBDC}
+              disabled={createBdcMutation.isPending}
             >
-              <ShoppingCart className="h-4 w-4" />
-              Générer BDC
+              {createBdcMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <ShoppingCart className="h-4 w-4" />
+              )}
+              {createBdcMutation.isPending ? "Génération..." : "Générer BDC"}
             </Button>
           )}
         </div>
