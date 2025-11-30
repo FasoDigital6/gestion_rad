@@ -15,12 +15,15 @@ import {
   formatMontant,
 } from "@/lib/utils/facture";
 import type { FactureStatut } from "@/lib/types/facture";
+import { FactureFormSheet } from "@/components/facture/facture-form-sheet";
 
 export default function FacturesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<FactureStatut | "all">(
     "all"
   );
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [formMode, setFormMode] = useState<"bdl" | "manual">("manual");
 
   const { data: factures = [], isLoading, error } = useFactures();
 
@@ -84,7 +87,10 @@ export default function FacturesPage() {
           </p>
         </div>
         <Button
-          onClick={() => alert("Formulaire création facture à implémenter")}
+          onClick={() => {
+            setFormMode("manual");
+            setIsFormOpen(true);
+          }}
           className="bg-brand hover:bg-brand/90"
         >
           <Plus className="h-4 w-4 mr-2" />
@@ -336,6 +342,14 @@ export default function FacturesPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Formulaire de création */}
+      <FactureFormSheet
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        mode={formMode}
+        facture={null}
+      />
     </div>
   );
 }

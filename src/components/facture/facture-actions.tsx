@@ -15,13 +15,14 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Send, XCircle, Loader2, FileText } from "lucide-react";
+import { Send, XCircle, Loader2 } from "lucide-react";
 import { useUpdateFactureStatut } from "@/lib/hooks/use-facture";
 import {
   canEmettreFacture,
   canAnnulerFacture,
 } from "@/lib/utils/facture";
 import type { Facture } from "@/lib/types/facture";
+import { FacturePDFDownload } from "./facture-pdf-download";
 
 interface FactureActionsProps {
   facture: Facture;
@@ -103,12 +104,9 @@ export function FactureActions({ facture }: FactureActionsProps) {
         </Button>
       )}
 
-      {/* Bouton Télécharger PDF (placeholder) */}
+      {/* Bouton Télécharger PDF */}
       {facture.statut !== "BROUILLON" && (
-        <Button variant="outline">
-          <FileText className="h-4 w-4 mr-2" />
-          Télécharger PDF
-        </Button>
+        <FacturePDFDownload facture={facture} />
       )}
 
       {/* Dialog Émettre */}

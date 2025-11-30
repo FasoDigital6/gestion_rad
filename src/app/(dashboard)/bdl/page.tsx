@@ -12,10 +12,14 @@ import { fr } from "date-fns/locale";
 import { getBdlStatusStyle, getBdlStatusLabel } from "@/lib/utils/bdl";
 import { BdlStatut } from "@/lib/types/bdl";
 import { Badge } from "@/components/ui/badge";
+import { BdlSelectionTable } from "@/components/bdl/bdl-selection-table";
+import { FactureFormSheet } from "@/components/facture/facture-form-sheet";
 
 export default function BdlPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<BdlStatut | "all">("all");
+  const [selectedBdlIds, setSelectedBdlIds] = useState<string[]>([]);
+  const [isFactureFormOpen, setIsFactureFormOpen] = useState(false);
 
   const { data: bdls, isLoading, error } = useBdls();
 
@@ -39,22 +43,6 @@ export default function BdlPage() {
     livres: bdls?.filter((bdl) => bdl.statut === "LIVRE").length || 0,
     annules: bdls?.filter((bdl) => bdl.statut === "ANNULE").length || 0,
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p>Chargement...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-red-600">Erreur lors du chargement des BDLs</p>
-      </div>
-    );
-  }
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -182,122 +170,38 @@ export default function BdlPage() {
         </CardContent>
       </Card>
 
-      {/* BDL Table */}
+      {/* BDL Table avec sélection */}
       <Card>
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Numéro
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    BDC
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Client
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date livraison
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Livreur
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Statut
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Montant
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredBdls && filteredBdls.length > 0 ? (
-                  filteredBdls.map((bdl) => (
-                    <tr key={bdl.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="font-medium text-gray-900">
-                          {bdl.numero}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Link
-                          href={`/bdc/${bdl.bdcId}`}
-                          className="text-brand hover:underline"
-                        >
-                          {bdl.bdcNumero}
-                        </Link>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {bdl.clientNom}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {format(bdl.dateLivraison, "dd MMM yyyy", {
-                            locale: fr,
-                          })}
-                        </div>
-                        {bdl.heureLivraison && (
-                          <div className="text-xs text-gray-500">
-                            {bdl.heureLivraison}
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {bdl.nomLivreur || "-"}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Badge className={getBdlStatusStyle(bdl.statut)}>
-                          {getBdlStatusLabel(bdl.statut)}
-                        </Badge>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <div className="text-sm font-medium text-gray-900">
-                          {bdl.totalNet.toLocaleString("fr-FR")} GNF
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <Link href={`/bdl/${bdl.id}`}>
-                          <Button variant="ghost" size="sm">
-                            Voir
-                          </Button>
-                        </Link>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td
-                      colSpan={8}
-                      className="px-6 py-12 text-center text-gray-500"
-                    >
-                      <div className="flex flex-col items-center gap-2">
-                        <Truck className="h-12 w-12 text-gray-300" />
-                        <p className="text-lg font-medium">
-                          Aucun bon de livraison trouvé
-                        </p>
-                        <p className="text-sm">
-                          {searchTerm || filterStatus !== "all"
-                            ? "Essayez de modifier vos critères de recherche"
-                            : "Les bons de livraison créés depuis les BDC apparaîtront ici"}
-                        </p>
-                      </div>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <p>Chargement...</p>
+            </div>
+          ) : error ? (
+            <div className="flex items-center justify-center py-12">
+              <p className="text-red-600">Erreur lors du chargement des BDLs</p>
+            </div>
+          ) : (
+            <BdlSelectionTable
+              bdls={filteredBdls || []}
+              selectedBdlIds={selectedBdlIds}
+              onSelectionChange={setSelectedBdlIds}
+              onCreateFacture={() => setIsFactureFormOpen(true)}
+            />
+          )}
         </CardContent>
       </Card>
+
+      {/* Formulaire de création de facture depuis BDL */}
+      <FactureFormSheet
+        open={isFactureFormOpen}
+        onOpenChange={(open) => {
+          setIsFactureFormOpen(open);
+          if (!open) setSelectedBdlIds([]);
+        }}
+        mode="bdl"
+        selectedBdls={bdls?.filter((b) => selectedBdlIds.includes(b.id))}
+      />
     </div>
   );
 }
