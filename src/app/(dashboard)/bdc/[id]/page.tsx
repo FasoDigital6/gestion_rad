@@ -1,15 +1,19 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
 import { useBdc } from "@/lib/hooks/use-bdc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { Loader2, ArrowLeft, Edit } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import Link from "next/link";
-import { getBdcStatusStyle, getBdcStatusLabel } from "@/lib/utils/bdc";
+import { getBdcStatusStyle, getBdcStatusLabel, canEditBdc } from "@/lib/utils/bdc";
+import { BdcFormSheet } from "@/components/bdc/bdc-form-sheet";
+import { BdcActions } from "@/components/bdc/bdc-actions";
+import { BdcDeliveryProgress } from "@/components/bdc/bdc-delivery-progress";
+import { BdlFormSheet } from "@/components/bdl/bdl-form-sheet";
 
 export default function BdcDetailsPage({
   params,
@@ -19,6 +23,8 @@ export default function BdcDetailsPage({
   const { id } = use(params);
   const router = useRouter();
   const { data: bdc, isLoading, error } = useBdc(id);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isBdlFormOpen, setIsBdlFormOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -51,22 +57,36 @@ export default function BdcDetailsPage({
       </Button>
 
       {/* Header */}
-      <div className="mb-8 flex justify-between items-start">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-            BDC {bdc.numero}
-            <span
-              className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getBdcStatusStyle(
-                bdc.statut
-              )}`}
+      <div className="mb-8">
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+              BDC {bdc.numero}
+              <span
+                className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getBdcStatusStyle(
+                  bdc.statut
+                )}`}
+              >
+                {getBdcStatusLabel(bdc.statut)}
+              </span>
+            </h1>
+            <p className="text-base text-gray-500 mt-1">
+              Client: {bdc.clientNom}
+            </p>
+          </div>
+          {canEditBdc(bdc) && (
+            <Button
+              onClick={() => setIsFormOpen(true)}
+              className="bg-brand hover:bg-brand/90"
             >
-              {getBdcStatusLabel(bdc.statut)}
-            </span>
-          </h1>
-          <p className="text-base text-gray-500 mt-1">
-            Client: {bdc.clientNom}
-          </p>
+              <Edit className="h-4 w-4 mr-2" />
+              Modifier
+            </Button>
+          )}
         </div>
+
+        {/* Actions de changement de statut */}
+        <BdcActions bdc={bdc} />
       </div>
 
       {/* Lien vers proforma source */}
@@ -220,6 +240,14 @@ export default function BdcDetailsPage({
         </CardContent>
       </Card>
 
+      {/* Progression de livraison */}
+      <div className="mb-8">
+        <BdcDeliveryProgress
+          bdc={bdc}
+          onCreateBdl={() => setIsBdlFormOpen(true)}
+        />
+      </div>
+
       {/* Informations additionnelles */}
       {(bdc.notes || bdc.conditionsPaiement) && (
         <div className="grid gap-6 md:grid-cols-2">
@@ -247,6 +275,20 @@ export default function BdcDetailsPage({
           )}
         </div>
       )}
+
+      {/* Formulaire d'édition BDC */}
+      <BdcFormSheet
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        bdc={bdc}
+      />
+
+      {/* Formulaire de création BDL */}
+      <BdlFormSheet
+        open={isBdlFormOpen}
+        onOpenChange={setIsBdlFormOpen}
+        bdc={bdc}
+      />
     </div>
   );
 }

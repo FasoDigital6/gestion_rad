@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { FileText, Search } from "lucide-react";
+import { FileText, Search, Plus } from "lucide-react";
 import { useBdcs } from "@/lib/hooks/use-bdc";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,10 +11,12 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { getBdcStatusStyle, getBdcStatusLabel } from "@/lib/utils/bdc";
 import { BdcStatut } from "@/lib/types/bdc";
+import { BdcFormSheet } from "@/components/bdc/bdc-form-sheet";
 
 export default function BdcPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<BdcStatut | "all">("all");
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const { data: bdcs, isLoading, error } = useBdcs();
 
@@ -59,13 +61,22 @@ export default function BdcPage() {
   return (
     <div className="container mx-auto py-8 px-4">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Gestion des bons de commande
-        </h1>
-        <p className="text-gray-500">
-          Gérez les bons de commande générés depuis les proformas validés
-        </p>
+      <div className="mb-8 flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Gestion des bons de commande
+          </h1>
+          <p className="text-gray-500">
+            Gérez les bons de commande générés depuis les proformas validés
+          </p>
+        </div>
+        <Button
+          onClick={() => setIsFormOpen(true)}
+          className="bg-brand hover:bg-brand/90"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Nouveau BDC
+        </Button>
       </div>
 
       {/* Stats Cards */}
@@ -251,6 +262,13 @@ export default function BdcPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Formulaire BDC */}
+      <BdcFormSheet
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        bdc={null}
+      />
     </div>
   );
 }

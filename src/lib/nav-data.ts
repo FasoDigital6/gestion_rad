@@ -52,7 +52,7 @@ export const navItems: { name: string; items: ItemNav[] }[] = [
       },
       {
         name: "Bons de livraison",
-        slug: "bl",
+        slug: "bdl",
         description: "Gestion des bons de livraison",
         icon: RiTruckLine,
       },
