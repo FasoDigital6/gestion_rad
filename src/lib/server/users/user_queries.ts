@@ -31,3 +31,22 @@ export const getUserById = async (id: string) => {
     return null;
   }
 };
+
+export const getAllUsers = async () => {
+  try {
+    const userCollections = dbAdmin.collection(USERS_COLLECTION_NAME);
+    const usersSnapshot = await userCollections.get();
+
+    const users: userData[] = usersSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      email: doc.data()?.email || "",
+      name: doc.data()?.name || "",
+      role: doc.data()?.role || "",
+    }));
+
+    return users;
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    return [];
+  }
+};

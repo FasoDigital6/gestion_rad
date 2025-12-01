@@ -9,6 +9,7 @@ import {
   RiFileChartLine,
   RiGroupLine,
   RiSettings3Line,
+  RiUserLine,
 } from "react-icons/ri";
 import { ItemNav } from "./types";
 
@@ -84,6 +85,17 @@ export const navItems: { name: string; items: ItemNav[] }[] = [
         slug: "rapports",
         description: "Rapports financiers et résultats",
         icon: RiFileChartLine,
+      },
+    ],
+  },
+  {
+    name: "Administration",
+    items: [
+      {
+        name: "Utilisateurs",
+        slug: "users",
+        description: "Gestion des comptes utilisateurs",
+        icon: RiUserLine,
       },
     ],
   },
