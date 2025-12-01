@@ -8,7 +8,6 @@ import { useRouter, useSelectedLayoutSegment } from "next/navigation";
 import {
   RiCloseLine,
   RiLogoutBoxRLine,
-  RiAccountCircleFill,
   RiMenu2Line,
 } from "react-icons/ri";
 
@@ -91,9 +90,13 @@ export function GlobalNav() {
 
         <div className="border-t border-slate-200 mt-auto">
           <div className="px-4 py-4 space-y-2">
-            <div className="flex items-center gap-3 px-1">
+            <Link
+              href="/profil"
+              onClick={close}
+              className="flex items-center gap-3 px-1 py-2 rounded-md hover:bg-[#e8f1fb] transition cursor-pointer"
+            >
               <Avatar className="h-10 w-10 border border-slate-200">
-                <AvatarImage src="/placeholder-avatar.jpg" alt="User avatar" />
+                <AvatarImage src={user?.photoURL || "/placeholder-avatar.jpg"} alt="User avatar" />
                 <AvatarFallback className="bg-slate-100 text-slate-700">
                   {user?.displayName?.charAt(0) || "U"}
                 </AvatarFallback>
@@ -102,22 +105,13 @@ export function GlobalNav() {
                 <span className="text-sm font-semibold text-slate-800">
                   {user?.displayName || "User Name"}
                 </span>
-                <span className="text-xs text-slate-500">
-                  {user?.email || "user@email.com"}
+                <span className="text-xs text-[#0b63b5]">
+                  Voir le profil
                 </span>
               </div>
-            </div>
+            </Link>
 
             <div className="space-y-1 pt-2">
-              <Link
-                href="/staff/dashboard"
-                onClick={close}
-                className="flex items-center w-full gap-x-3 rounded-md px-3 py-2 text-sm font-medium text-slate-800 hover:bg-[#e8f1fb] hover:text-[#0b63b5] transition"
-              >
-                <RiAccountCircleFill className="h-5 w-5 text-[#0b63b5]" />
-                Mon profil
-              </Link>
-
               <button
                 onClick={handleLogout}
                 className="flex items-center w-full gap-x-3 rounded-md px-3 py-2 text-sm font-medium text-slate-800 hover:bg-[#e8f1fb] hover:text-[#0b63b5] transition"

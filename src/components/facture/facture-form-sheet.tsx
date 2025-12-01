@@ -192,7 +192,9 @@ export function FactureFormSheet({
 
   // Charger les données en mode BDL
   useEffect(() => {
-    if (mode === "bdl" && selectedBdls.length > 0 && open) {
+    if (!open) return; // Ne rien faire si le formulaire n'est pas ouvert
+
+    if (mode === "bdl" && selectedBdls.length > 0) {
       const aggregatedLines = aggregateBdlLines(selectedBdls);
 
       reset({
@@ -208,7 +210,7 @@ export function FactureFormSheet({
         lieu: selectedBdls[0].lieu || "Siguiri",
         fournisseur: selectedBdls[0].fournisseur || "Mr Balla TRAORE",
       });
-    } else if (mode === "manual" && open) {
+    } else if (mode === "manual") {
       reset({
         mode: "manual",
         clientId: "",
@@ -229,7 +231,8 @@ export function FactureFormSheet({
         fournisseur: "Mr Balla TRAORE",
       });
     }
-  }, [mode, selectedBdls, open, reset]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const onSubmit = async (data: FactureFormValues) => {
     try {

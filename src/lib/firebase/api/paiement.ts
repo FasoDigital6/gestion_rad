@@ -122,6 +122,9 @@ export async function addPaiement(
       const factureRef = doc(db, FACTURES_COLLECTION_NAME, input.factureId);
       const clientRef = doc(db, CLIENTS_COLLECTION_NAME, facture.clientId);
 
+      // IMPORTANT: Toutes les lectures doivent être faites AVANT les écritures
+      const clientDoc = await transaction.get(clientRef);
+
       // Calculer les nouveaux totaux de la facture
       const newTotalPaye = facture.totalPaye + input.montant;
       const newSoldeRestant = facture.totalNet - newTotalPaye;
@@ -168,7 +171,6 @@ export async function addPaiement(
       transaction.update(factureRef, factureUpdateData);
 
       // Mettre à jour les totaux du client
-      const clientDoc = await transaction.get(clientRef);
       if (clientDoc.exists()) {
         const clientData = clientDoc.data();
         transaction.update(clientRef, {
@@ -209,6 +211,9 @@ export async function deletePaiement(id: string): Promise<void> {
       const factureRef = doc(db, FACTURES_COLLECTION_NAME, paiement.factureId);
       const clientRef = doc(db, CLIENTS_COLLECTION_NAME, facture.clientId);
 
+      // IMPORTANT: Toutes les lectures doivent être faites AVANT les écritures
+      const clientDoc = await transaction.get(clientRef);
+
       // Calculer les nouveaux totaux
       const newTotalPaye = facture.totalPaye - paiement.montant;
       const newSoldeRestant = facture.totalNet - newTotalPaye;
@@ -236,7 +241,6 @@ export async function deletePaiement(id: string): Promise<void> {
       transaction.update(factureRef, factureUpdateData);
 
       // Mettre à jour les totaux du client
-      const clientDoc = await transaction.get(clientRef);
       if (clientDoc.exists()) {
         const clientData = clientDoc.data();
         transaction.update(clientRef, {
