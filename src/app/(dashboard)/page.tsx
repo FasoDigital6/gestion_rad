@@ -1,238 +1,280 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useDashboardStats } from "@/lib/hooks/use-dashboard-stats";
+import { formatMontant } from "@/lib/utils/dashboard";
+import { StatsCard } from "@/components/dashboard/stats-card";
+import { DocumentCounterCard } from "@/components/dashboard/document-counter-card";
+import { FinancialBarChart } from "@/components/dashboard/financial-bar-chart";
+import { InvoicesDonutChart } from "@/components/dashboard/invoices-donut-chart";
+import { ConversionPipelineChart } from "@/components/dashboard/conversion-pipeline-chart";
+import { PaymentHealthCard } from "@/components/dashboard/payment-health-card";
+import { ActionItemsList } from "@/components/dashboard/action-items-list";
+import { RecentClientsTable } from "@/components/dashboard/recent-clients-table";
+import { RecentInvoicesTable } from "@/components/dashboard/recent-invoices-table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Plus, TrendingUp, TrendingDown, Users, FileText, Wallet } from "lucide-react";
-
-// Données factices pour la démonstration
-const statsData = [
-  {
-    title: "Total des ventes",
-    value: "2,350,000 GNF",
-    change: "+12.5%",
-    trend: "up",
-    icon: Wallet,
-    description: "vs mois dernier",
-  },
-  {
-    title: "Clients actifs",
-    value: "142",
-    change: "+8",
-    trend: "up",
-    icon: Users,
-    description: "nouveaux ce mois",
-  },
-  {
-    title: "Factures en attente",
-    value: "23",
-    change: "-5",
-    trend: "down",
-    icon: FileText,
-    description: "vs semaine dernière",
-  },
-  {
-    title: "Taux de paiement",
-    value: "94.2%",
-    change: "+2.1%",
-    trend: "up",
-    icon: TrendingUp,
-    description: "en hausse",
-  },
-];
-
-const recentClients = [
-  { id: 1, nom: "Société Générale", type: "Entreprise", statut: "Actif", derniereFacture: "2025-01-15" },
-  { id: 2, nom: "Orange Guinée", type: "Entreprise", statut: "Actif", derniereFacture: "2025-01-12" },
-  { id: 3, nom: "EDG", type: "Entreprise", statut: "Actif", derniereFacture: "2025-01-10" },
-  { id: 4, nom: "MTN Guinée", type: "Entreprise", statut: "Actif", derniereFacture: "2025-01-08" },
-  { id: 5, nom: "Ministère des Mines", type: "Administration", statut: "Actif", derniereFacture: "2025-01-05" },
-];
+import { TrendingUp, Receipt, DollarSign, AlertCircle, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
+  const {
+    financialKPIs,
+    documentCounts,
+    conversionRates,
+    actionItems,
+    recentData,
+    isLoading,
+    isError,
+  } = useDashboardStats();
+
+  const router = useRouter();
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-8 p-6 lg:p-8">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+          <p className="text-base text-muted-foreground">
+            Chargement de vos données...
+          </p>
+        </div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div
+              key={i}
+              className="h-32 bg-muted animate-pulse rounded-xl"
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-col gap-8 p-6 lg:p-8">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+          <p className="text-base text-destructive">
+            Erreur lors du chargement des données. Veuillez réessayer.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Calculer factures en retard pour PaymentHealthCard
+  const overdueInvoices = actionItems.filter(
+    (action) => action.type === "facture-retard"
+  );
+  const overdueAmount = overdueInvoices.reduce((sum, action) => {
+    const montantMeta = action.metadata.find((m) => m.label === "Montant dû");
+    if (montantMeta) {
+      // Extraire le montant du format "123 456 GNF"
+      const montant = parseFloat(
+        montantMeta.value.replace(/[^\d]/g, "")
+      );
+      return sum + (isNaN(montant) ? 0 : montant);
+    }
+    return sum;
+  }, 0);
+
   return (
     <div className="flex flex-col gap-8 p-6 lg:p-8">
       {/* Header */}
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">Dashboard</h1>
-        <p className="text-base text-gray-500">
-          Vue d'ensemble de votre activité commerciale
-        </p>
-      </div>
-
-      {/* Stats Cards Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {statsData.map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <Card key={stat.title} className="border-border hover:shadow-md transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">
-                  {stat.title}
-                </CardTitle>
-                <Icon className="h-5 w-5 text-gray-400" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
-                <div className="flex items-center gap-1 mt-1">
-                  {stat.trend === "up" ? (
-                    <TrendingUp className="h-4 w-4 text-green-600" />
-                  ) : (
-                    <TrendingDown className="h-4 w-4 text-red-600" />
-                  )}
-                  <span
-                    className={`text-sm font-medium ${
-                      stat.trend === "up" ? "text-green-600" : "text-red-600"
-                    }`}
-                  >
-                    {stat.change}
-                  </span>
-                  <span className="text-sm text-gray-500">{stat.description}</span>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-
-      {/* Recent Clients Table */}
-      <Card className="border-border">
-        <CardHeader className="border-b border-border">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-xl font-semibold">Clients récents</CardTitle>
-              <CardDescription className="mt-1">
-                Liste des derniers clients ajoutés ou modifiés
-              </CardDescription>
-            </div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+          <p className="text-base text-muted-foreground mt-1">
+            Vue d'ensemble de votre activité commerciale
+          </p>
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
             <Button className="gap-2">
               <Plus className="h-4 w-4" />
-              Nouveau client
+              Actions rapides
             </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-border bg-gray-50/50">
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Nom
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Type
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Statut
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Dernière facture
-                  </th>
-                  <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border bg-white">
-                {recentClients.map((client) => (
-                  <tr
-                    key={client.id}
-                    className="hover:bg-gray-50 transition-colors cursor-pointer"
-                  >
-                    <td className="px-6 py-4">
-                      <div className="text-sm font-medium text-gray-900">{client.nom}</div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-600">{client.type}</div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        {client.statut}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-600">
-                        {new Date(client.derniereFacture).toLocaleDateString('fr-FR')}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80">
-                        Voir détails
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuItem onClick={() => router.push("/clients/new")}>
+              Nouveau client
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push("/proformas/new")}>
+              Nouvelle proforma
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push("/bdc/new")}>
+              Nouveau bon de commande
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push("/bdl/new")}>
+              Nouveau bon de livraison
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push("/factures/new")}>
+              Nouvelle facture
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
 
-      {/* Additional Cards Row */}
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card className="border-border">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold">Activité récente</CardTitle>
-            <CardDescription>Dernières actions effectuées</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {[
-                { action: "Nouvelle facture créée", client: "Orange Guinée", time: "Il y a 2h" },
-                { action: "Paiement reçu", client: "Société Générale", time: "Il y a 5h" },
-                { action: "Client ajouté", client: "EDG", time: "Il y a 1 jour" },
-                { action: "Proforma envoyée", client: "MTN Guinée", time: "Il y a 2 jours" },
-              ].map((activity, index) => (
-                <div key={index} className="flex items-start gap-3 pb-3 border-b border-border last:border-0 last:pb-0">
-                  <div className="h-2 w-2 rounded-full bg-primary mt-2" />
-                  <div className="flex-1 space-y-1">
-                    <p className="text-sm font-medium text-gray-900">{activity.action}</p>
-                    <p className="text-xs text-gray-500">{activity.client}</p>
-                  </div>
-                  <span className="text-xs text-gray-400">{activity.time}</span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+      {/* Section 1: KPI Financiers */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold">Indicateurs financiers</h2>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <StatsCard
+            title="Total livré"
+            value={formatMontant(financialKPIs.totalLivre)}
+            icon={TrendingUp}
+            color="blue"
+          />
+          <StatsCard
+            title="Total facturé"
+            value={formatMontant(financialKPIs.totalFacture)}
+            icon={Receipt}
+            color="purple"
+          />
+          <StatsCard
+            title="Total payé"
+            value={formatMontant(financialKPIs.totalPaye)}
+            icon={DollarSign}
+            color="green"
+          />
+          <StatsCard
+            title="Total dû"
+            value={formatMontant(financialKPIs.totalDu)}
+            icon={AlertCircle}
+            color="red"
+          />
+        </div>
+        <FinancialBarChart data={financialKPIs} />
+      </div>
 
-        <Card className="border-border">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold">À faire</CardTitle>
-            <CardDescription>Tâches en attente</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {[
-                { task: "Relancer 3 factures impayées", priority: "high", dueDate: "Aujourd'hui" },
-                { task: "Envoyer proforma à Ministère des Mines", priority: "medium", dueDate: "Demain" },
-                { task: "Mettre à jour les prix", priority: "low", dueDate: "Cette semaine" },
-                { task: "Vérifier les paiements en attente", priority: "medium", dueDate: "Vendredi" },
-              ].map((todo, index) => (
-                <div key={index} className="flex items-start gap-3 pb-3 border-b border-border last:border-0 last:pb-0">
-                  <input
-                    type="checkbox"
-                    className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                  />
-                  <div className="flex-1 space-y-1">
-                    <p className="text-sm font-medium text-gray-900">{todo.task}</p>
-                    <p className="text-xs text-gray-500">{todo.dueDate}</p>
-                  </div>
-                  <span
-                    className={`text-xs px-2 py-0.5 rounded-full ${
-                      todo.priority === "high"
-                        ? "bg-red-100 text-red-700"
-                        : todo.priority === "medium"
-                        ? "bg-yellow-100 text-yellow-700"
-                        : "bg-gray-100 text-gray-700"
-                    }`}
-                  >
-                    {todo.priority === "high" ? "Urgent" : todo.priority === "medium" ? "Moyen" : "Bas"}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+      {/* Section 2: Compteurs Documents + Graphique Donut */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold">Documents</h2>
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-2 grid gap-6 sm:grid-cols-2">
+            <DocumentCounterCard
+              type="proforma"
+              total={documentCounts.proformas.total}
+              breakdown={[
+                {
+                  statut: "BROUILLON",
+                  count: documentCounts.proformas.parStatut.BROUILLON || 0,
+                  color: "bg-gray-100 text-gray-800",
+                },
+                {
+                  statut: "ENVOYE",
+                  count: documentCounts.proformas.parStatut.ENVOYE || 0,
+                  color: "bg-blue-100 text-blue-800",
+                },
+                {
+                  statut: "VALIDE",
+                  count: documentCounts.proformas.parStatut.VALIDE || 0,
+                  color: "bg-green-100 text-green-800",
+                },
+              ]}
+            />
+            <DocumentCounterCard
+              type="bdc"
+              total={documentCounts.bdcs.total}
+              breakdown={[
+                {
+                  statut: "BROUILLON",
+                  count: documentCounts.bdcs.parStatut.BROUILLON || 0,
+                  color: "bg-gray-100 text-gray-800",
+                },
+                {
+                  statut: "ENVOYE",
+                  count: documentCounts.bdcs.parStatut.ENVOYE || 0,
+                  color: "bg-blue-100 text-blue-800",
+                },
+                {
+                  statut: "APPROUVE",
+                  count: documentCounts.bdcs.parStatut.APPROUVE || 0,
+                  color: "bg-green-100 text-green-800",
+                },
+              ]}
+            />
+            <DocumentCounterCard
+              type="bdl"
+              total={documentCounts.bdls.total}
+              breakdown={[
+                {
+                  statut: "BROUILLON",
+                  count: documentCounts.bdls.parStatut.BROUILLON || 0,
+                  color: "bg-gray-100 text-gray-800",
+                },
+                {
+                  statut: "EN_ROUTE",
+                  count: documentCounts.bdls.parStatut.EN_ROUTE || 0,
+                  color: "bg-blue-100 text-blue-800",
+                },
+                {
+                  statut: "LIVRE",
+                  count: documentCounts.bdls.parStatut.LIVRE || 0,
+                  color: "bg-green-100 text-green-800",
+                },
+              ]}
+            />
+            <DocumentCounterCard
+              type="facture"
+              total={documentCounts.factures.total}
+              breakdown={[
+                {
+                  statut: "BROUILLON",
+                  count: documentCounts.factures.parStatut.BROUILLON || 0,
+                  color: "bg-gray-100 text-gray-800",
+                },
+                {
+                  statut: "EMISE",
+                  count: documentCounts.factures.parStatut.EMISE || 0,
+                  color: "bg-blue-100 text-blue-800",
+                },
+                {
+                  statut: "PAYEE",
+                  count: documentCounts.factures.parStatut.PAYEE || 0,
+                  color: "bg-green-100 text-green-800",
+                },
+              ]}
+            />
+          </div>
+          <div className="lg:col-span-1">
+            <InvoicesDonutChart data={documentCounts.factures} />
+          </div>
+        </div>
+      </div>
+
+      {/* Section 3: Indicateurs Performance */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold">Performance</h2>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <ConversionPipelineChart data={conversionRates} />
+          <PaymentHealthCard
+            financialKPIs={financialKPIs}
+            overdueInvoicesCount={overdueInvoices.length}
+            overdueAmount={overdueAmount}
+          />
+        </div>
+      </div>
+
+      {/* Section 4: Actions Requises */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold">À faire</h2>
+        <ActionItemsList actions={actionItems} />
+      </div>
+
+      {/* Section 5: Activité Récente */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold">Activité récente</h2>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <RecentClientsTable clients={recentData.clients} />
+          <RecentInvoicesTable factures={recentData.factures} />
+        </div>
       </div>
     </div>
   );

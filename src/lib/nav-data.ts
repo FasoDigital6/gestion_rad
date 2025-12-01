@@ -19,7 +19,7 @@ export const navItems: { name: string; items: ItemNav[] }[] = [
     items: [
       {
         name: "Tableau de bord",
-        slug: "dashboard",
+        slug: "",
         description: "Vue d'ensemble: total livré, facturé, payé, graphiques",
         icon: RiDashboard3Line,
       },
