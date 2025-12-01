@@ -5,11 +5,19 @@ import { USERS_COLLECTION_NAME } from "@/lib/firebase/collections_name";
 export const getUserDataById = async (userId: string) => {
   const userCollections = dbAdmin.collection(USERS_COLLECTION_NAME);
   const userSnapshot = await userCollections.doc(userId).get();
+  const data = userSnapshot.data();
   const userData: userData = {
     id: userSnapshot.id,
-    email: userSnapshot.data()?.email,
-    name: userSnapshot.data()?.name,
-    role: userSnapshot.data()?.role,
+    email: data?.email || "",
+    name: data?.name || "",
+    nom: data?.nom,
+    prenom: data?.prenom,
+    telephone: data?.telephone,
+    poste: data?.poste,
+    adresse: data?.adresse,
+    role: data?.role || "user",
+    disabled: data?.disabled || false,
+    createdAt: data?.createdAt,
   };
   return userData;
 };
@@ -37,12 +45,22 @@ export const getAllUsers = async () => {
     const userCollections = dbAdmin.collection(USERS_COLLECTION_NAME);
     const usersSnapshot = await userCollections.get();
 
-    const users: userData[] = usersSnapshot.docs.map((doc) => ({
-      id: doc.id,
-      email: doc.data()?.email || "",
-      name: doc.data()?.name || "",
-      role: doc.data()?.role || "",
-    }));
+    const users: userData[] = usersSnapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        email: data?.email || "",
+        name: data?.name || "",
+        nom: data?.nom,
+        prenom: data?.prenom,
+        telephone: data?.telephone,
+        poste: data?.poste,
+        adresse: data?.adresse,
+        role: data?.role || "user",
+        disabled: data?.disabled || false,
+        createdAt: data?.createdAt,
+      };
+    });
 
     return users;
   } catch (error) {

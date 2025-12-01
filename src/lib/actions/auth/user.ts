@@ -12,5 +12,12 @@ export interface userData {
     id: string;
     email: string;
     name: string;
+    nom?: string;
+    prenom?: string;
+    telephone?: string;
+    poste?: string;
+    adresse?: string;
     role: string;
+    disabled?: boolean;
+    createdAt?: string;
 }

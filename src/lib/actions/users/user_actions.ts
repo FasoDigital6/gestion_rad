@@ -2,7 +2,7 @@
 
 import { authAdmin, dbAdmin } from "@/lib/firebase/server/config";
 import { USERS_COLLECTION_NAME } from "@/lib/firebase/collections_name";
-import { createUserSchema, CreateUserInput } from "@/lib/schemas/user-schema";
+import { createUserSchema, CreateUserInput, updateUserSchema, UpdateUserInput } from "@/lib/schemas/user-schema";
 
 export async function createUserAction(formData: CreateUserInput) {
   try {
@@ -12,7 +12,9 @@ export async function createUserAction(formData: CreateUserInput) {
       return { error: "Données invalides" };
     }
 
-    const { email, name } = result.data;
+    const { email, nom, prenom, telephone, poste, adresse } = result.data;
+
+    console.log("Telephone value after Zod parsing:", telephone, typeof telephone);
 
     // Vérifier si l'utilisateur existe déjà
     const existingUser = await authAdmin
@@ -27,12 +29,19 @@ export async function createUserAction(formData: CreateUserInput) {
     const tempPassword = Math.random().toString(36).slice(-12) + "Aa1!";
 
     // Créer l'utilisateur dans Firebase Auth
-    const userRecord = await authAdmin.createUser({
+    const createUserData: any = {
       email,
-      displayName: name,
+      displayName: `${prenom} ${nom}`,
       password: tempPassword,
       emailVerified: false,
-    });
+    };
+
+    // N'ajouter phoneNumber que s'il est fourni
+    if (telephone) {
+      createUserData.phoneNumber = telephone;
+    }
+
+    const userRecord = await authAdmin.createUser(createUserData);
 
     // Définir le rôle par défaut (user) dans les custom claims
     await authAdmin.setCustomUserClaims(userRecord.uid, { role: "user" });
@@ -43,8 +52,13 @@ export async function createUserAction(formData: CreateUserInput) {
       .doc(userRecord.uid)
       .set({
         email,
-        name,
+        nom,
+        prenom,
+        telephone: telephone || "",
+        poste: poste || "",
+        adresse: adresse || "",
         role: "user",
+        disabled: false,
         createdAt: new Date().toISOString(),
       });
 
@@ -68,6 +82,73 @@ export async function createUserAction(formData: CreateUserInput) {
       return { error: error.message };
     }
     return { error: "Erreur lors de la création de l'utilisateur" };
+  }
+}
+
+export async function updateUserAction(userId: string, formData: UpdateUserInput) {
+  try {
+    // Validation
+    const result = updateUserSchema.safeParse(formData);
+    if (!result.success) {
+      return { error: "Données invalides" };
+    }
+
+    const { email, nom, prenom, telephone, poste, adresse, role, disabled } = result.data;
+
+    // Mettre à jour Firebase Auth
+    const updateAuthData: any = {};
+    if (nom && prenom) {
+      updateAuthData.displayName = `${prenom} ${nom}`;
+    }
+    if (email) {
+      updateAuthData.email = email;
+    }
+    if (telephone !== undefined) {
+      // Si telephone est undefined (chaîne vide transformée), utiliser null pour supprimer le numéro
+      // Sinon, utiliser la valeur fournie (qui doit être au format E.164)
+      updateAuthData.phoneNumber = telephone || null;
+    }
+    if (disabled !== undefined) {
+      updateAuthData.disabled = disabled;
+    }
+
+    if (Object.keys(updateAuthData).length > 0) {
+      await authAdmin.updateUser(userId, updateAuthData);
+    }
+
+    // Mettre à jour les custom claims si le rôle change
+    if (role) {
+      await authAdmin.setCustomUserClaims(userId, { role });
+    }
+
+    // Mettre à jour Firestore
+    const updateFirestoreData: any = {
+      updatedAt: new Date().toISOString(),
+    };
+    if (email) updateFirestoreData.email = email;
+    if (nom) updateFirestoreData.nom = nom;
+    if (prenom) updateFirestoreData.prenom = prenom;
+    if (telephone !== undefined) updateFirestoreData.telephone = telephone;
+    if (poste !== undefined) updateFirestoreData.poste = poste;
+    if (adresse !== undefined) updateFirestoreData.adresse = adresse;
+    if (role) updateFirestoreData.role = role;
+    if (disabled !== undefined) updateFirestoreData.disabled = disabled;
+
+    await dbAdmin
+      .collection(USERS_COLLECTION_NAME)
+      .doc(userId)
+      .update(updateFirestoreData);
+
+    return {
+      success: true,
+      message: "Utilisateur mis à jour avec succès",
+    };
+  } catch (error: unknown) {
+    console.error("Error updating user:", error);
+    if (error instanceof Error) {
+      return { error: error.message };
+    }
+    return { error: "Erreur lors de la mise à jour de l'utilisateur" };
   }
 }
 

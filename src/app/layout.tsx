@@ -5,6 +5,7 @@ import { Noto_Sans } from "next/font/google";
 
 import { AuthProvider } from "@/lib/firebase/auth/auth-context";
 import { getCurrentUser } from "@/lib/server/users/users_services";
+import { Toaster } from "sonner";
 
 const notoSans = Noto_Sans({ subsets: ["latin"] });
 
@@ -24,6 +25,7 @@ export default async function RootLayout({
     <html lang="fr">
       <body className={`${notoSans.className}`}>
         <AuthProvider user={user}>{children}</AuthProvider>
+        <Toaster position="top-right" richColors />
       </body>
     </html>
   );
