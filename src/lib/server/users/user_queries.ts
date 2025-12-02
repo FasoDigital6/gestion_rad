@@ -17,7 +17,7 @@ export const getUserDataById = async (userId: string) => {
     adresse: data?.adresse,
     role: data?.role || "user",
     disabled: data?.disabled || false,
-    createdAt: data?.createdAt,
+    createdAt: data?.createdAt ? (typeof data.createdAt === 'string' ? data.createdAt : data.createdAt.toDate().toISOString()) : undefined,
   };
   return userData;
 };
@@ -58,7 +58,7 @@ export const getAllUsers = async () => {
         adresse: data?.adresse,
         role: data?.role || "user",
         disabled: data?.disabled || false,
-        createdAt: data?.createdAt,
+        createdAt: data?.createdAt ? (typeof data.createdAt === 'string' ? data.createdAt : data.createdAt.toDate().toISOString()) : undefined,
       };
     });
 

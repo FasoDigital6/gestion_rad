@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -15,17 +15,34 @@ import {
   RiCheckLine,
   RiCloseLine
 } from "react-icons/ri";
-import { updateProfile, updatePassword } from "firebase/auth";
+import { updatePassword } from "firebase/auth";
 import { auth_client } from "@/lib/firebase/client/config";
+import { useUser, useUpdateUser } from "@/lib/hooks/use-users";
+import { createProfile } from "@/lib/firebase/api/users";
 
 export default function ProfilPage() {
-  const user = useAuth();
+  const authUser = useAuth();
+  const { data: user, isLoading } = useUser(authUser?.uid || "");
+  const updateUserMutation = useUpdateUser();
+
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   // États pour le profil
-  const [displayName, setDisplayName] = useState(user?.displayName || "");
-  const [photoURL, setPhotoURL] = useState(user?.photoURL || "");
+  const [telephone, setTelephone] = useState("");
+  const [adresse, setAdresse] = useState("");
+  const [email, setEmail] = useState("");
+
+  // Initialiser les états quand les données utilisateur sont chargées
+  useEffect(() => {
+    if (user) {
+      setTelephone(user.telephone || "");
+      setAdresse(user.adresse || "");
+      setEmail(user.email || "");
+    } else if (authUser?.email) {
+      setEmail(authUser.email);
+    }
+  }, [user, authUser]);
 
   // États pour le mot de passe
   const [currentPassword, setCurrentPassword] = useState("");
@@ -37,20 +54,42 @@ export default function ProfilPage() {
   const [passwordMessage, setPasswordMessage] = useState<{ type: "success" | "error", text: string } | null>(null);
 
   const handleUpdateProfile = async () => {
-    if (!auth_client.currentUser) return;
+    if (!authUser?.uid) return;
 
     setProfileMessage(null);
     try {
-      await updateProfile(auth_client.currentUser, {
-        displayName,
-        photoURL: photoURL || undefined,
-      });
+      if (user) {
+        // Mise à jour si l'utilisateur existe dans Firestore
+        await updateUserMutation.mutateAsync({
+          id: user.id,
+          telephone,
+          adresse,
+          email,
+          poste: user.poste,
+        });
+      } else {
+        // Création du profil si l'utilisateur n'existe pas dans Firestore
+        // On récupère le nom/prénom depuis authUser displayName (format "Prénom Nom")
+        const displayName = authUser.displayName || "";
+        const parts = displayName.split(" ");
+        const prenom = parts[0] || "";
+        const nom = parts.slice(1).join(" ") || "";
+
+        await createProfile(authUser.uid, {
+          email: authUser.email || "",
+          nom,
+          prenom,
+          telephone,
+          adresse,
+          role: "user", // Rôle par défaut
+        });
+
+        // Recharger la page pour récupérer le nouvel utilisateur via le hook
+        setTimeout(() => window.location.reload(), 1000);
+      }
 
       setProfileMessage({ type: "success", text: "Profil mis à jour avec succès !" });
       setIsEditingProfile(false);
-
-      // Rafraîchir la page pour mettre à jour l'UI
-      setTimeout(() => window.location.reload(), 1500);
     } catch (error: any) {
       setProfileMessage({ type: "error", text: error.message || "Erreur lors de la mise à jour du profil" });
     }
@@ -97,6 +136,10 @@ export default function ProfilPage() {
     }
   };
 
+  if (isLoading) {
+    return <div className="flex justify-center py-8">Chargement...</div>;
+  }
+
   return (
     <div className="container mx-auto py-8 px-4 max-w-4xl">
       {/* En-tête */}
@@ -112,14 +155,16 @@ export default function ProfilPage() {
         <CardContent className="pt-6">
           <div className="flex items-center gap-6">
             <Avatar className="h-24 w-24 border-4 border-slate-200">
-              <AvatarImage src={photoURL || user?.photoURL || "/placeholder-avatar.jpg"} alt="Avatar" />
               <AvatarFallback className="bg-[#0b63b5] text-white text-2xl">
-                {displayName?.charAt(0) || user?.displayName?.charAt(0) || "U"}
+                {user?.prenom?.charAt(0) || authUser?.displayName?.charAt(0) || "U"}
+                {user?.nom?.charAt(0) || ""}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <h2 className="text-2xl font-bold text-gray-900">{user?.displayName || "Utilisateur"}</h2>
-              <p className="text-gray-500">{user?.email}</p>
+              <h2 className="text-2xl font-bold text-gray-900">
+                {user ? `${user.prenom} ${user.nom}` : authUser?.displayName || "Utilisateur"}
+              </h2>
+              <p className="text-gray-500">{user?.email || authUser?.email}</p>
               <p className="text-sm text-gray-400 mt-1">
                 Rôle: <span className="font-medium text-[#0b63b5]">{user?.role || "Utilisateur"}</span>
               </p>
@@ -163,8 +208,9 @@ export default function ProfilPage() {
                     size="sm"
                     onClick={() => {
                       setIsEditingProfile(false);
-                      setDisplayName(user?.displayName || "");
-                      setPhotoURL(user?.photoURL || "");
+                      setTelephone(user?.telephone || "");
+                      setAdresse(user?.adresse || "");
+                      setEmail(user?.email || authUser?.email || "");
                       setProfileMessage(null);
                     }}
                     className="gap-2"
@@ -176,9 +222,10 @@ export default function ProfilPage() {
                     size="sm"
                     onClick={handleUpdateProfile}
                     className="gap-2 bg-[#0b63b5] hover:bg-[#0b63b5]/90"
+                    disabled={updateUserMutation.isPending}
                   >
                     <RiCheckLine className="h-4 w-4" />
-                    Enregistrer
+                    {updateUserMutation.isPending ? "Enregistrement..." : "Enregistrer"}
                   </Button>
                 </div>
               )}
@@ -186,53 +233,69 @@ export default function ProfilPage() {
             <CardContent className="space-y-4">
               {profileMessage && (
                 <div
-                  className={`p-4 rounded-md ${
-                    profileMessage.type === "success"
-                      ? "bg-green-50 text-green-800 border border-green-200"
-                      : "bg-red-50 text-red-800 border border-red-200"
-                  }`}
+                  className={`p-4 rounded-md ${profileMessage.type === "success"
+                    ? "bg-green-50 text-green-800 border border-green-200"
+                    : "bg-red-50 text-red-800 border border-red-200"
+                    }`}
                 >
                   {profileMessage.text}
                 </div>
               )}
 
-              <div className="space-y-2">
-                <Label htmlFor="displayName">Nom complet</Label>
-                <Input
-                  id="displayName"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  disabled={!isEditingProfile}
-                  className="h-11"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="prenom">Prénom</Label>
+                  <Input
+                    id="prenom"
+                    value={user?.prenom || authUser?.displayName?.split(" ")[0] || ""}
+                    disabled
+                    className="h-11 bg-gray-50"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="nom">Nom</Label>
+                  <Input
+                    id="nom"
+                    value={user?.nom || authUser?.displayName?.split(" ").slice(1).join(" ") || ""}
+                    disabled
+                    className="h-11 bg-gray-50"
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
-                  value={user?.email || ""}
-                  disabled
-                  className="h-11 bg-gray-50"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={!isEditingProfile}
+                  className="h-11"
                 />
-                <p className="text-xs text-gray-500">
-                  L'email ne peut pas être modifié
-                </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="photoURL">Photo de profil (URL)</Label>
+                <Label htmlFor="telephone">Téléphone</Label>
                 <Input
-                  id="photoURL"
-                  value={photoURL}
-                  onChange={(e) => setPhotoURL(e.target.value)}
+                  id="telephone"
+                  value={telephone}
+                  onChange={(e) => setTelephone(e.target.value)}
                   disabled={!isEditingProfile}
-                  placeholder="https://example.com/photo.jpg"
+                  placeholder="Votre numéro de téléphone"
                   className="h-11"
                 />
-                <p className="text-xs text-gray-500">
-                  Entrez l'URL d'une image pour votre photo de profil
-                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="adresse">Adresse</Label>
+                <Input
+                  id="adresse"
+                  value={adresse}
+                  onChange={(e) => setAdresse(e.target.value)}
+                  disabled={!isEditingProfile}
+                  placeholder="Votre adresse complète"
+                  className="h-11"
+                />
               </div>
 
               <div className="space-y-2">
@@ -260,11 +323,10 @@ export default function ProfilPage() {
             <CardContent className="space-y-4">
               {passwordMessage && (
                 <div
-                  className={`p-4 rounded-md ${
-                    passwordMessage.type === "success"
-                      ? "bg-green-50 text-green-800 border border-green-200"
-                      : "bg-red-50 text-red-800 border border-red-200"
-                  }`}
+                  className={`p-4 rounded-md ${passwordMessage.type === "success"
+                    ? "bg-green-50 text-green-800 border border-green-200"
+                    : "bg-red-50 text-red-800 border border-red-200"
+                    }`}
                 >
                   {passwordMessage.text}
                 </div>

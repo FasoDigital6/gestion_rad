@@ -7,7 +7,7 @@ import {
   RiShoppingBagLine,
   RiFileChartLine,
   RiGroupLine,
-  RiSettings3Line,
+
   RiUserLine,
 } from "react-icons/ri";
 import { ItemNav } from "./types";
@@ -92,15 +92,5 @@ export const navItems: { name: string; items: ItemNav[] }[] = [
       },
     ],
   },
-  {
-    name: "Application",
-    items: [
-      {
-        name: "Paramètres",
-        slug: "settings",
-        description: "Configuration: numérotation, PDF, TVA, délais",
-        icon: RiSettings3Line,
-      },
-    ],
-  },
+
 ];

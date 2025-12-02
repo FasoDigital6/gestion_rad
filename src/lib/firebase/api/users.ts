@@ -14,6 +14,8 @@ import { db } from "@/lib/firebase/client/config";
 import { USERS_COLLECTION_NAME } from "@/lib/firebase/collections_name";
 import { createUserAction, updateUserAction, deleteUserAction } from "@/lib/actions/users/user_actions";
 
+import { CreateUserInput, UpdateUserInput } from "@/lib/schemas/user-schema";
+
 export interface User {
   id: string;
   email: string;
@@ -25,27 +27,6 @@ export interface User {
   role: string;
   disabled?: boolean;
   createdAt?: Date;
-}
-
-export interface CreateUserInput {
-  nom: string;
-  prenom: string;
-  email: string;
-  telephone?: string;
-  poste?: string;
-  adresse?: string;
-}
-
-export interface UpdateUserInput {
-  id: string;
-  nom?: string;
-  prenom?: string;
-  email?: string;
-  telephone?: string;
-  poste?: string;
-  adresse?: string;
-  role?: "admin" | "user";
-  disabled?: boolean;
 }
 
 /**
@@ -95,13 +76,13 @@ export async function getUsers(): Promise<User[]> {
 /**
  * Récupérer un utilisateur par son ID
  */
-export async function getUser(id: string): Promise<User> {
+export async function getUser(id: string): Promise<User | null> {
   try {
     const userDoc = doc(db, USERS_COLLECTION_NAME, id);
     const userSnapshot = await getDoc(userDoc);
 
     if (!userSnapshot.exists()) {
-      throw new Error("Utilisateur introuvable");
+      return null;
     }
 
     const data = userSnapshot.data();
@@ -155,10 +136,17 @@ export async function createUser(input: CreateUserInput): Promise<void> {
 /**
  * Mettre à jour un utilisateur
  */
-export async function updateUser(input: UpdateUserInput): Promise<void> {
+export type UpdateUserParams = UpdateUserInput & { id: string };
+
+/**
+ * Mettre à jour un utilisateur
+ */
+export async function updateUser(input: UpdateUserParams): Promise<void> {
   try {
     const { id, ...data } = input;
-    const result = await updateUserAction(id, data);
+    // Ensure all required fields for UpdateUserInput are present or undefined
+    // We need to cast or ensure data matches UpdateUserInput
+    const result = await updateUserAction(id, data as UpdateUserInput);
 
     if (result.error) {
       throw new Error(result.error);
@@ -197,7 +185,14 @@ export async function toggleUserStatus(
   disabled: boolean
 ): Promise<void> {
   try {
-    const result = await updateUserAction(id, { disabled });
+    // We need to pass required fields as undefined if they are missing but required by type
+    const updateData: UpdateUserInput = {
+      disabled,
+      telephone: undefined,
+      poste: undefined,
+      adresse: undefined
+    };
+    const result = await updateUserAction(id, updateData);
 
     if (result.error) {
       throw new Error(result.error);
@@ -207,5 +202,25 @@ export async function toggleUserStatus(
   } catch (error: any) {
     console.error("Erreur lors du changement de statut:", error);
     throw new Error(error.message || "Impossible de changer le statut de l'utilisateur");
+  }
+}
+
+/**
+ * Créer ou mettre à jour le profil utilisateur (Firestore uniquement)
+ * Utilisé quand l'utilisateur existe dans Auth mais pas dans Firestore
+ */
+import { setDoc } from "firebase/firestore";
+
+export async function createProfile(id: string, data: Partial<User>): Promise<void> {
+  try {
+    const userDoc = doc(db, USERS_COLLECTION_NAME, id);
+    await setDoc(userDoc, {
+      ...data,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    }, { merge: true });
+  } catch (error: any) {
+    console.error("Erreur lors de la création du profil:", error);
+    throw new Error(error.message || "Impossible de créer le profil");
   }
 }

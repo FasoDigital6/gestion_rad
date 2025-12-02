@@ -3,7 +3,7 @@ import { Metadata } from "next";
 
 import { GlobalNav } from "@/components/global/nav";
 
-import ReactQueryProvider from "@/lib/providers/react_queries/react_query_provider";
+
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,9 +24,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ReactQueryProvider>
+    <>
       <GlobalNav />
       <div className="lg:pl-72">{children}</div>
-    </ReactQueryProvider>
+    </>
   );
 }
