@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   getPaiementsByFacture,
+  getPaiementsByClient,
   getPaiement,
   addPaiement,
   deletePaiement,
@@ -16,6 +17,17 @@ export function usePaiementsByFacture(factureId: string) {
     queryKey: ["paiements", "facture", factureId],
     queryFn: () => getPaiementsByFacture(factureId),
     enabled: !!factureId,
+  });
+}
+
+/**
+ * Hook pour récupérer tous les paiements d'un client
+ */
+export function usePaiementsByClient(clientId: string) {
+  return useQuery({
+    queryKey: ["paiements", "client", clientId],
+    queryFn: () => getPaiementsByClient(clientId),
+    enabled: !!clientId,
   });
 }
 

@@ -3,6 +3,7 @@ import {
   getBdls,
   getBdl,
   getBdlsByBdc,
+  getBdlsByClient,
   getBdcDeliveryProgress,
   createBdl,
   createBdlFromBdc,
@@ -45,6 +46,17 @@ export function useBdlsByBdc(bdcId: string) {
     queryKey: ["bdls", "bdc", bdcId],
     queryFn: () => getBdlsByBdc(bdcId),
     enabled: !!bdcId,
+  });
+}
+
+/**
+ * Hook pour récupérer les BDLs d'un client
+ */
+export function useBdlsByClient(clientId: string) {
+  return useQuery({
+    queryKey: ["bdls", "client", clientId],
+    queryFn: () => getBdlsByClient(clientId),
+    enabled: !!clientId,
   });
 }
 

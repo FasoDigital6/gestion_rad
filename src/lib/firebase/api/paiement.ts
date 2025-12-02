@@ -64,6 +64,60 @@ export async function getPaiementsByFacture(
 }
 
 /**
+ * Récupérer tous les paiements d'un client
+ */
+export async function getPaiementsByClient(
+  clientId: string
+): Promise<Paiement[]> {
+  try {
+    // Récupérer toutes les factures du client avec jointure
+    const facturesRef = collection(db, FACTURES_COLLECTION_NAME);
+    const qFactures = query(
+      facturesRef,
+      where("clientId", "==", clientId)
+    );
+    const facturesSnapshot = await getDocs(qFactures);
+
+    const factureIds: string[] = [];
+    facturesSnapshot.forEach((doc) => {
+      factureIds.push(doc.id);
+    });
+
+    if (factureIds.length === 0) {
+      return [];
+    }
+
+    // Récupérer tous les paiements des factures du client
+    const paiementsRef = collection(db, PAIEMENTS_COLLECTION_NAME);
+    const qPaiements = query(
+      paiementsRef,
+      where("factureId", "in", factureIds),
+      orderBy("datePaiement", "desc")
+    );
+    const paiementsSnapshot = await getDocs(qPaiements);
+
+    const paiements: Paiement[] = [];
+    paiementsSnapshot.forEach((doc) => {
+      const data = doc.data();
+      paiements.push({
+        id: doc.id,
+        ...data,
+        datePaiement: data.datePaiement?.toDate() || new Date(),
+        dateCreation: data.dateCreation?.toDate() || new Date(),
+      } as Paiement);
+    });
+
+    return paiements;
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des paiements du client:",
+      error
+    );
+    throw error;
+  }
+}
+
+/**
  * Récupérer un paiement par ID
  */
 export async function getPaiement(id: string): Promise<Paiement> {

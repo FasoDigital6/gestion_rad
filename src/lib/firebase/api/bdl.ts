@@ -235,6 +235,62 @@ export async function getBdlsByBdc(bdcId: string): Promise<Bdl[]> {
 }
 
 /**
+ * Récupérer les BDLs d'un client spécifique
+ */
+export async function getBdlsByClient(clientId: string): Promise<Bdl[]> {
+  try {
+    const bdlsRef = collection(db, BDL_COLLECTION_NAME);
+    const q = query(
+      bdlsRef,
+      where("clientId", "==", clientId),
+      orderBy("dateCreation", "desc")
+    );
+    const querySnapshot = await getDocs(q);
+
+    const bdls: Bdl[] = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      bdls.push({
+        id: doc.id,
+        numero: data.numero,
+        bdcId: data.bdcId,
+        bdcNumero: data.bdcNumero,
+        clientId: data.clientId,
+        clientNom: data.clientNom,
+        dateLivraison: data.dateLivraison?.toDate() || new Date(),
+        heureLivraison: data.heureLivraison,
+        nomLivreur: data.nomLivreur,
+        observations: data.observations,
+        signatureReception: data.signatureReception,
+        lignes: data.lignes || [],
+        total: data.total || 0,
+        remisePourcentage: data.remisePourcentage || 0,
+        remiseMontant: data.remiseMontant || 0,
+        totalNet: data.totalNet || 0,
+        dateCreation: data.dateCreation?.toDate() || new Date(),
+        dateModification: data.dateModification?.toDate(),
+        dateEnRoute: data.dateEnRoute?.toDate(),
+        dateLivree: data.dateLivree?.toDate(),
+        dateAnnulation: data.dateAnnulation?.toDate(),
+        statut: data.statut || "BROUILLON",
+        notes: data.notes,
+        factureId: data.factureId,
+        lieu: data.lieu || "Siguiri",
+        fournisseur: data.fournisseur || "Mr Balla TRAORE",
+      });
+    });
+
+    return bdls;
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des BDLs du client:",
+      error
+    );
+    throw new Error("Impossible de récupérer les BDLs du client");
+  }
+}
+
+/**
  * FONCTION CRITIQUE : Calculer la progression de livraison d'un BDC
  * Retourne les quantités restantes pour chaque ligne
  */
