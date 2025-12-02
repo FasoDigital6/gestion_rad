@@ -4,7 +4,7 @@ import { authConfig } from "./lib/firebase/auth/config";
 import { filterStandardClaims } from "next-firebase-auth-edge/lib/auth/claims";
 
 const HOME_PATHS = ["/"];
-const AUTH_PATHS = ["/login", "auth/logout"];
+const AUTH_PATHS = ["/login", "/auth/logout"];
 
 const pathStartsWith = (pathname: string, prefixes: string[]) =>
   prefixes.some((prefix) => pathname.startsWith(prefix));
@@ -69,6 +69,11 @@ export async function middleware(request: NextRequest) {
 
     handleError: async (error) => {
       console.error("Auth error", error);
+
+      if (isAuthPath) {
+        return createNextResponseWithHeaders(request);
+      }
+
       return NextResponse.redirect(new URL("/login", request.url));
     },
   });

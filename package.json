@@ -38,11 +38,8 @@
     "react-hook-form": "^7.66.1",
     "react-icons": "^5.5.0",
     "react-select": "^5.10.2",
-<<<<<<< HEAD
-    "sonner": "^2.0.7",
-=======
     "recharts": "^3.5.1",
->>>>>>> origin/proforma
+    "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
     "zod": "^4.1.12"
   },
