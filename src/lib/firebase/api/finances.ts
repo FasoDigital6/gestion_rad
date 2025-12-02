@@ -10,16 +10,23 @@ import { getFactures } from "./facture";
 import { getDepenses } from "./depense";
 
 /**
- * Récupérer l'état financier global du système
+ * Récupérer l'état financier global du système avec filtrage par période
  * Calcule tous les montants basés sur les BDL, factures et dépenses
  */
-export async function getEtatFinancier(): Promise<EtatFinancier> {
+export async function getEtatFinancier(
+  periode: FiltrePeriode
+): Promise<EtatFinancier> {
   try {
     // 1. Récupérer tous les BDL
     const bdls = await getBdls();
 
-    // Livré non facturé (BDL LIVRE sans factureId)
-    const bdlsLivres = bdls.filter(
+    // Filtrer les BDL par période (basé sur dateLivraison)
+    const bdlsPeriode = bdls.filter(
+      (bdl) => bdl.dateLivraison && isDateInPeriode(bdl.dateLivraison, periode)
+    );
+
+    // Livré non facturé (BDL LIVRE sans factureId dans la période)
+    const bdlsLivres = bdlsPeriode.filter(
       (bdl) => bdl.statut === "LIVRE" && !bdl.factureId
     );
     const livreMontant = bdlsLivres.reduce(
@@ -27,14 +34,20 @@ export async function getEtatFinancier(): Promise<EtatFinancier> {
       0
     );
 
-    // BDL annulés
-    const bdlsAnnules = bdls.filter((bdl) => bdl.statut === "ANNULE");
+    // BDL annulés dans la période
+    const bdlsAnnules = bdlsPeriode.filter((bdl) => bdl.statut === "ANNULE");
 
     // 2. Récupérer toutes les factures
     const factures = await getFactures();
 
-    // Facturé non payé (Factures EMISE + PAYEE_PARTIELLE)
-    const facturesNonPayees = factures.filter(
+    // Filtrer les factures par période (basé sur dateEmission)
+    const facturesPeriode = factures.filter(
+      (facture) =>
+        facture.dateEmission && isDateInPeriode(facture.dateEmission, periode)
+    );
+
+    // Facturé non payé (Factures EMISE + PAYEE_PARTIELLE dans la période)
+    const facturesNonPayees = facturesPeriode.filter(
       (f) => f.statut === "EMISE" || f.statut === "PAYEE_PARTIELLE"
     );
     const factureMontant = facturesNonPayees.reduce(
@@ -42,26 +55,38 @@ export async function getEtatFinancier(): Promise<EtatFinancier> {
       0
     );
 
-    // Payé (Factures PAYEE - on compte le totalPaye)
-    const facturesPayees = factures.filter((f) => f.statut === "PAYEE");
+    // Payé (Factures PAYEE dans la période - on compte le totalPaye)
+    const facturesPayees = facturesPeriode.filter((f) => f.statut === "PAYEE");
     const payeMontant = facturesPayees.reduce(
       (sum, f) => sum + f.totalPaye,
       0
     );
 
-    // Factures annulées
-    const facturesAnnulees = factures.filter((f) => f.statut === "ANNULEE");
+    // Factures annulées dans la période
+    const facturesAnnulees = facturesPeriode.filter(
+      (f) => f.statut === "ANNULEE"
+    );
 
-    // Montant annulé total (BDL + Factures)
+    // Montant annulé total (BDL + Factures) dans la période
     const annuleMontant =
       bdlsAnnules.reduce((sum, bdl) => sum + bdl.totalNet, 0) +
       facturesAnnulees.reduce((sum, f) => sum + f.totalNet, 0);
 
     // 3. Récupérer toutes les dépenses
     const depenses = await getDepenses();
-    const totalDepenses = depenses.reduce((sum, d) => sum + d.montant, 0);
 
-    // Dépenses par catégorie
+    // Filtrer les dépenses par période (basé sur dateDepense)
+    const depensesPeriode = depenses.filter(
+      (depense) =>
+        depense.dateDepense && isDateInPeriode(depense.dateDepense, periode)
+    );
+
+    const totalDepenses = depensesPeriode.reduce(
+      (sum, d) => sum + d.montant,
+      0
+    );
+
+    // Dépenses par catégorie (filtrées par période)
     const depensesParCategorie = {} as Record<CategorieDepense, number>;
 
     // Initialiser toutes les catégories à 0
@@ -69,14 +94,14 @@ export async function getEtatFinancier(): Promise<EtatFinancier> {
       depensesParCategorie[cat as CategorieDepense] = 0;
     });
 
-    // Calculer les montants par catégorie
-    depenses.forEach((d) => {
+    // Calculer les montants par catégorie (seulement pour la période)
+    depensesPeriode.forEach((d) => {
       depensesParCategorie[d.categorie] =
         (depensesParCategorie[d.categorie] || 0) + d.montant;
     });
 
     // 4. Calculer le résultat net
-    // Recettes = Montant total payé
+    // Recettes = Montant total payé dans la période
     const recettes = payeMontant;
     const resultatNet = recettes - totalDepenses;
 
@@ -103,7 +128,7 @@ export async function getEtatFinancier(): Promise<EtatFinancier> {
 
       // Dépenses
       totalDepenses,
-      depensesCount: depenses.length,
+      depensesCount: depensesPeriode.length,
       depensesParCategorie,
 
       // Résultat
@@ -205,12 +230,12 @@ export async function getIndicateursFinanciers(
     // 1. Récupérer tous les BDL
     const bdls = await getBdls();
 
-    // Filtrer les BDL livrés par période (basé sur dateLivree)
+    // Filtrer les BDL livrés par période (basé sur dateLivraison)
     const bdlsLivres = bdls.filter(
       (bdl) =>
         bdl.statut === "LIVRE" &&
-        bdl.dateLivree &&
-        isDateInPeriode(bdl.dateLivree, periode)
+        bdl.dateLivraison &&
+        isDateInPeriode(bdl.dateLivraison, periode)
     );
 
     // Total livré (tous les BDL livrés, facturés ou non)

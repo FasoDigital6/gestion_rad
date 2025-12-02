@@ -11,8 +11,10 @@ import {
   Send,
   ShoppingCart,
   Loader2,
+  ArrowLeft,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { pdf } from "@react-pdf/renderer";
@@ -128,6 +130,14 @@ Réseau Africain de Développement (RAD)`;
 
   return (
     <div className="flex flex-col gap-6 p-6 lg:p-8">
+      {/* Bouton retour au client */}
+      <Link href={`/clients/${proforma.clientId}`}>
+        <Button variant="ghost" className="mb-2">
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Retour au client
+        </Button>
+      </Link>
+
       {/* Header avec actions */}
       <div className="flex items-start justify-between">
         <div>
@@ -136,23 +146,22 @@ Réseau Africain de Développement (RAD)`;
               {proforma.numero}
             </h1>
             <span
-              className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                proforma.statut === "BROUILLON"
-                  ? "bg-gray-100 text-gray-800"
-                  : proforma.statut === "ENVOYE"
+              className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${proforma.statut === "BROUILLON"
+                ? "bg-gray-100 text-gray-800"
+                : proforma.statut === "ENVOYE"
                   ? "bg-blue-100 text-blue-800"
                   : proforma.statut === "VALIDE"
-                  ? "bg-green-100 text-green-800"
-                  : "bg-red-100 text-red-800"
-              }`}
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800"
+                }`}
             >
               {proforma.statut === "BROUILLON"
                 ? "Brouillon"
                 : proforma.statut === "ENVOYE"
-                ? "Envoyé"
-                : proforma.statut === "VALIDE"
-                ? "Validé"
-                : "Rejeté"}
+                  ? "Envoyé"
+                  : proforma.statut === "VALIDE"
+                    ? "Validé"
+                    : "Rejeté"}
             </span>
           </div>
           <p className="text-base text-gray-500 mt-1">

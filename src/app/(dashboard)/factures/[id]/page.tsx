@@ -59,15 +59,22 @@ export default function FactureDetailsPage({
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-7xl">
-      {/* Bouton retour */}
-      <Button
-        variant="ghost"
-        onClick={() => router.push("/factures")}
-        className="mb-4"
-      >
-        <ArrowLeft className="h-4 w-4 mr-2" />
-        Retour aux factures
-      </Button>
+      {/* Boutons retour */}
+      <div className="flex items-center gap-2 mb-4">
+        <Link href={`/clients/${facture.clientId}`}>
+          <Button variant="ghost">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Retour au client
+          </Button>
+        </Link>
+        <span className="text-gray-300">|</span>
+        <Button
+          variant="ghost"
+          onClick={() => router.push("/factures")}
+        >
+          Retour aux factures
+        </Button>
+      </div>
 
       {/* Header */}
       <div className="mb-8 flex justify-between items-start">

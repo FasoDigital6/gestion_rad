@@ -7,12 +7,12 @@ import {
 import { FiltrePeriode } from "@/lib/types/finances";
 
 /**
- * Hook pour récupérer l'état financier global
+ * Hook pour récupérer l'état financier global avec filtrage par période
  */
-export function useEtatFinancier() {
+export function useEtatFinancier(periode: FiltrePeriode) {
   return useQuery({
-    queryKey: ["finances", "etat"],
-    queryFn: getEtatFinancier,
+    queryKey: ["finances", "etat", periode],
+    queryFn: () => getEtatFinancier(periode),
   });
 }
 

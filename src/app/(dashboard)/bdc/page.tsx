@@ -12,6 +12,8 @@ import { fr } from "date-fns/locale";
 import { getBdcStatusStyle, getBdcStatusLabel } from "@/lib/utils/bdc";
 import { BdcStatut } from "@/lib/types/bdc";
 import { BdcFormSheet } from "@/components/bdc/bdc-form-sheet";
+import { DataTable } from "@/components/data-table/data-table";
+import { createColumns } from "./columns-wrapper";
 
 export default function BdcPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -82,9 +84,8 @@ export default function BdcPage() {
       {/* Stats Cards */}
       <div className="grid gap-6 md:grid-cols-4 mb-8">
         <Card
-          className={`cursor-pointer transition-all ${
-            filterStatus === "BROUILLON" ? "ring-2 ring-brand" : ""
-          }`}
+          className={`cursor-pointer transition-all ${filterStatus === "BROUILLON" ? "ring-2 ring-brand" : ""
+            }`}
           onClick={() =>
             setFilterStatus(filterStatus === "BROUILLON" ? "all" : "BROUILLON")
           }
@@ -98,9 +99,8 @@ export default function BdcPage() {
         </Card>
 
         <Card
-          className={`cursor-pointer transition-all ${
-            filterStatus === "ENVOYE" ? "ring-2 ring-brand" : ""
-          }`}
+          className={`cursor-pointer transition-all ${filterStatus === "ENVOYE" ? "ring-2 ring-brand" : ""
+            }`}
           onClick={() =>
             setFilterStatus(filterStatus === "ENVOYE" ? "all" : "ENVOYE")
           }
@@ -114,9 +114,8 @@ export default function BdcPage() {
         </Card>
 
         <Card
-          className={`cursor-pointer transition-all ${
-            filterStatus === "APPROUVE" ? "ring-2 ring-brand" : ""
-          }`}
+          className={`cursor-pointer transition-all ${filterStatus === "APPROUVE" ? "ring-2 ring-brand" : ""
+            }`}
           onClick={() =>
             setFilterStatus(filterStatus === "APPROUVE" ? "all" : "APPROUVE")
           }
@@ -130,9 +129,8 @@ export default function BdcPage() {
         </Card>
 
         <Card
-          className={`cursor-pointer transition-all ${
-            filterStatus === "ANNULE" ? "ring-2 ring-brand" : ""
-          }`}
+          className={`cursor-pointer transition-all ${filterStatus === "ANNULE" ? "ring-2 ring-brand" : ""
+            }`}
           onClick={() =>
             setFilterStatus(filterStatus === "ANNULE" ? "all" : "ANNULE")
           }
@@ -173,84 +171,14 @@ export default function BdcPage() {
       <Card>
         <CardContent className="p-0">
           {filteredBdcs && filteredBdcs.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Numéro
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Proforma
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Client
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Date commande
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Montant
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Statut
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredBdcs.map((bdc) => (
-                    <tr key={bdc.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {bdc.numero}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">
-                          {bdc.proformaNumero || "-"}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm text-gray-900">
-                          {bdc.clientNom}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">
-                          {format(bdc.dateCommande, "dd/MM/yyyy", {
-                            locale: fr,
-                          })}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <div className="text-sm font-medium text-gray-900">
-                          {bdc.totalNet.toLocaleString("fr-FR")} GNF
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getBdcStatusStyle(
-                            bdc.statut
-                          )}`}
-                        >
-                          {getBdcStatusLabel(bdc.statut)}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <Link href={`/bdc/${bdc.id}`}>
-                          <Button variant="ghost" size="sm">
-                            Voir détails
-                          </Button>
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <DataTable
+              columns={createColumns({
+                onView: (bdc) => window.location.href = `/bdc/${bdc.id}`,
+              })}
+              data={filteredBdcs}
+              filterColumn="numero"
+              filterPlaceholder="Filtrer par numéro..."
+            />
           ) : (
             <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
               <FileText className="h-12 w-12 mb-4 opacity-20" />

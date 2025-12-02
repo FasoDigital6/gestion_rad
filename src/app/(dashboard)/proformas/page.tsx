@@ -15,6 +15,8 @@ import { pdf } from "@react-pdf/renderer";
 import { ProformaPDFTemplate } from "@/components/proformas/proforma-pdf-template";
 import { ProformaFormSheet } from "@/components/proformas/proforma-form-sheet";
 import { Proforma } from "@/lib/types/proforma";
+import { DataTable } from "@/components/data-table/data-table";
+import { createColumns } from "./columns-wrapper";
 
 export default function ProformasPage() {
   const router = useRouter();
@@ -113,7 +115,7 @@ Réseau Africain de Développement (RAD)`;
     const matchesSearch =
       proforma.numero.toLowerCase().includes(searchTerm.toLowerCase()) ||
       proforma.clientNom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      proforma.numeroDA.toLowerCase().includes(searchTerm.toLowerCase());
+      (proforma.numeroDA || "").toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesFilter = filterStatus === "all" || proforma.statut === filterStatus;
 
@@ -135,11 +137,10 @@ Réseau Africain de Développement (RAD)`;
       {/* Stats Cards */}
       <div className="grid gap-6 md:grid-cols-3">
         <Card
-          className={`border cursor-pointer transition-all ${
-            filterStatus === "BROUILLON"
-              ? "border-ring shadow-md"
-              : "border-border hover:border-ring/50"
-          }`}
+          className={`border cursor-pointer transition-all ${filterStatus === "BROUILLON"
+            ? "border-ring shadow-md"
+            : "border-border hover:border-ring/50"
+            }`}
           onClick={() => setFilterStatus(filterStatus === "BROUILLON" ? "all" : "BROUILLON")}
         >
           <CardContent className="p-6">
@@ -156,11 +157,10 @@ Réseau Africain de Développement (RAD)`;
         </Card>
 
         <Card
-          className={`border cursor-pointer transition-all ${
-            filterStatus === "ENVOYE"
-              ? "border-brand/80 shadow-md"
-              : "border-border hover:border-ring/50"
-          }`}
+          className={`border cursor-pointer transition-all ${filterStatus === "ENVOYE"
+            ? "border-brand/80 shadow-md"
+            : "border-border hover:border-ring/50"
+            }`}
           onClick={() => setFilterStatus(filterStatus === "ENVOYE" ? "all" : "ENVOYE")}
         >
           <CardContent className="p-6">
@@ -177,11 +177,10 @@ Réseau Africain de Développement (RAD)`;
         </Card>
 
         <Card
-          className={`border cursor-pointer transition-all ${
-            filterStatus === "VALIDE"
-              ? "border-success/80 shadow-md"
-              : "border-border hover:border-ring/50"
-          }`}
+          className={`border cursor-pointer transition-all ${filterStatus === "VALIDE"
+            ? "border-success/80 shadow-md"
+            : "border-border hover:border-ring/50"
+            }`}
           onClick={() => setFilterStatus(filterStatus === "VALIDE" ? "all" : "VALIDE")}
         >
           <CardContent className="p-6">
@@ -243,133 +242,16 @@ Réseau Africain de Développement (RAD)`;
             <div className="flex items-center justify-center h-64">
               <div className="text-destructive">Erreur lors du chargement des proformas</div>
             </div>
-          ) : filteredProformas && filteredProformas.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-border bg-muted/50">
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Numéro
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Client
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Date
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Montant
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Statut
-                    </th>
-                    <th className="px-6 py-4 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border bg-background">
-                  {filteredProformas.map((proforma) => (
-                    <tr
-                      key={proforma.id}
-                      className="hover:bg-muted transition-colors"
-                    >
-                      <td className="px-6 py-4">
-                        <div className="text-sm font-medium text-foreground">
-                          {proforma.numero}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm text-foreground max-w-[200px] truncate">
-                          {proforma.clientNom}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm text-muted-foreground">
-                          {format(proforma.dateCreation, "dd/MM/yyyy", { locale: fr })}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm font-medium text-foreground">
-                          {proforma.totalNet.toLocaleString("fr-FR")} GNF
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            proforma.statut === "BROUILLON"
-                              ? "bg-muted text-muted-foreground"
-                              : proforma.statut === "ENVOYE"
-                              ? "bg-brand/10 text-brand"
-                              : proforma.statut === "VALIDE"
-                              ? "bg-success/10 text-success"
-                              : "bg-destructive/10 text-destructive"
-                          }`}
-                        >
-                          {proforma.statut === "BROUILLON"
-                            ? "Brouillon"
-                            : proforma.statut === "ENVOYE"
-                            ? "Envoyé"
-                            : proforma.statut === "VALIDE"
-                            ? "Validé"
-                            : "Rejeté"}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          {proforma.statut === "BROUILLON" && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleEditProforma(proforma)}
-                              className="text-muted-foreground hover:text-brand hover:bg-brand/10"
-                              title="Modifier"
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                          )}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDownloadPDF(proforma)}
-                            className="text-muted-foreground hover:text-foreground"
-                            title="Télécharger PDF"
-                          >
-                            <Download className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleSendEmail(proforma)}
-                            className="text-muted-foreground hover:text-foreground"
-                            title="Envoyer par email"
-                          >
-                            <Mail className="h-4 w-4" />
-                          </Button>
-                          <Link href={`/proformas/${proforma.id}`}>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="text-brand hover:text-brand hover:bg-brand/10"
-                            >
-                              Voir détails
-                            </Button>
-                          </Link>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
           ) : (
-            <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
-              <FileText className="h-12 w-12 mb-4 opacity-20" />
-              <p className="text-lg font-medium">Aucun proforma trouvé</p>
-              <p className="text-sm opacity-70 mt-1">
-                Commencez par créer votre premier proforma
-              </p>
-            </div>
+            <DataTable
+              columns={createColumns({
+                onEdit: handleEditProforma,
+                onView: (proforma) => router.push(`/proformas/${proforma.id}`),
+              })}
+              data={filteredProformas || []}
+              filterColumn="numero"
+              filterPlaceholder="Filtrer par numéro..."
+            />
           )}
         </CardContent>
       </Card>

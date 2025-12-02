@@ -20,7 +20,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = await getCurrentUser();
-  console.log(user, "user");
   return (
     <html lang="fr">
       <body className={`${notoSans.className}`}>

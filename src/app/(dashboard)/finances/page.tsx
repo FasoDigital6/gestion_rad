@@ -6,13 +6,14 @@ import {
   useDepensesParCategorie,
   useIndicateursFinanciers,
 } from "@/lib/hooks/use-finances";
+import { useAuth } from "@/lib/firebase/auth/auth-context";
 import { FinancialOverviewCard } from "@/components/finances/financial-overview-card";
 import { CycleStatusCard } from "@/components/finances/cycle-status-card";
 import { DepensesSummaryCard } from "@/components/finances/depenses-summary-card";
 import { IndicateursCard } from "@/components/finances/indicateurs-card";
 import { PeriodeFilter } from "@/components/finances/periode-filter";
+import { DepenseFormSheet } from "@/components/depense/depense-form-sheet";
 import { Loader2, Package, FileText, CheckCircle, XCircle, Truck, FileCheck } from "lucide-react";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { FiltrePeriode } from "@/lib/types/finances";
@@ -46,13 +47,18 @@ function getPeriodeLabel(periode: FiltrePeriode): string {
 }
 
 export default function FinancesPage() {
+  const auth = useAuth();
+
   // Période par défaut : année courante
   const [periode, setPeriode] = useState<FiltrePeriode>({
     type: "annee",
     annee: new Date().getFullYear(),
   });
 
-  const { data: etatFinancier, isLoading: isLoadingEtat } = useEtatFinancier();
+  // État pour le modal de dépense
+  const [isDepenseFormOpen, setIsDepenseFormOpen] = useState(false);
+
+  const { data: etatFinancier, isLoading: isLoadingEtat } = useEtatFinancier(periode);
   const { data: depensesParCategorie = [], isLoading: isLoadingDepenses } =
     useDepensesParCategorie();
   const { data: indicateurs, isLoading: isLoadingIndicateurs } =
@@ -86,11 +92,12 @@ export default function FinancesPage() {
             Vue d'ensemble de la situation financière
           </p>
         </div>
-        <Button asChild className="bg-brand hover:bg-brand/90">
-          <Link href="/finances/depenses">
-            <Plus className="h-4 w-4 mr-2" />
-            Ajouter une dépense
-          </Link>
+        <Button
+          onClick={() => setIsDepenseFormOpen(true)}
+          className="bg-brand hover:bg-brand/90"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Ajouter une dépense
         </Button>
       </div>
 
@@ -191,6 +198,15 @@ export default function FinancesPage() {
           </p>
         </div>
       </div>
+
+      {/* Modal d'ajout de dépense */}
+      <DepenseFormSheet
+        open={isDepenseFormOpen}
+        onOpenChange={setIsDepenseFormOpen}
+        depense={null}
+        userId={auth?.uid}
+        userName={auth?.displayName || undefined}
+      />
     </div>
   );
 }

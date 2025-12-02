@@ -16,6 +16,8 @@ import {
 } from "@/lib/utils/facture";
 import type { FactureStatut } from "@/lib/types/facture";
 import { FactureFormSheet } from "@/components/facture/facture-form-sheet";
+import { DataTable } from "@/components/data-table/data-table";
+import { createColumns } from "./columns-wrapper";
 
 export default function FacturesPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -248,97 +250,14 @@ export default function FacturesPage() {
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Numéro
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Client
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Date émission
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Montant
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Payé
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Solde
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Statut
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredFactures.map((facture) => (
-                    <tr
-                      key={facture.id}
-                      className="hover:bg-gray-50 cursor-pointer"
-                      onClick={() =>
-                        (window.location.href = `/factures/${facture.id}`)
-                      }
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Link
-                          href={`/factures/${facture.id}`}
-                          className="text-sm font-medium text-brand hover:underline"
-                        >
-                          {facture.numero}
-                        </Link>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {facture.clientNom}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">
-                          {format(facture.dateEmission, "dd MMM yyyy", {
-                            locale: fr,
-                          })}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <div className="text-sm font-medium text-gray-900">
-                          {formatMontant(facture.totalNet)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <div className="text-sm font-medium text-green-600">
-                          {formatMontant(facture.totalPaye)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <div
-                          className={`text-sm font-medium ${
-                            facture.soldeRestant > 0
-                              ? "text-red-600"
-                              : "text-green-600"
-                          }`}
-                        >
-                          {formatMontant(facture.soldeRestant)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getFactureStatusStyle(
-                            facture.statut
-                          )}`}
-                        >
-                          {getFactureStatusLabel(facture.statut)}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <DataTable
+              columns={createColumns({
+                onView: (facture) => window.location.href = `/factures/${facture.id}`,
+              })}
+              data={filteredFactures}
+              filterColumn="numero"
+              filterPlaceholder="Filtrer par numéro..."
+            />
           )}
         </CardContent>
       </Card>

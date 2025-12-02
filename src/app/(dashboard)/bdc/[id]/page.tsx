@@ -47,14 +47,22 @@ export default function BdcDetailsPage({
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <Button
-        variant="ghost"
-        className="mb-6"
-        onClick={() => router.push("/bdc")}
-      >
-        <ArrowLeft className="h-4 w-4 mr-2" />
-        Retour à la liste
-      </Button>
+      {/* Boutons de retour */}
+      <div className="flex items-center gap-2 mb-6">
+        <Link href={`/clients/${bdc.clientId}`}>
+          <Button variant="ghost">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Retour au client
+          </Button>
+        </Link>
+        <span className="text-gray-300">|</span>
+        <Button
+          variant="ghost"
+          onClick={() => router.push("/bdc")}
+        >
+          Retour à la liste
+        </Button>
+      </div>
 
       {/* Header */}
       <div className="mb-8">

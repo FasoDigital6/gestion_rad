@@ -49,14 +49,22 @@ export default function BdlDetailsPage({ params }: BdlDetailsPageProps) {
     <div className="container mx-auto py-8 px-4 max-w-6xl">
       {/* Header */}
       <div className="mb-6">
-        <Button
-          variant="ghost"
-          onClick={() => router.push("/bdl")}
-          className="mb-4"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Retour aux bons de livraison
-        </Button>
+        {/* Boutons de retour */}
+        <div className="flex items-center gap-2 mb-4">
+          <Link href={`/clients/${bdl.clientId}`}>
+            <Button variant="ghost">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Retour au client
+            </Button>
+          </Link>
+          <span className="text-gray-300">|</span>
+          <Button
+            variant="ghost"
+            onClick={() => router.push("/bdl")}
+          >
+            Retour aux bons de livraison
+          </Button>
+        </div>
 
         <div className="flex justify-between items-start">
           <div>

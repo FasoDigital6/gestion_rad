@@ -39,36 +39,50 @@ export function ClientDocumentsTabs({ clientId }: ClientDocumentsTabsProps) {
       accessorKey: "numero",
       header: "N°",
       cell: ({ row }) => (
-        <span className="font-mono text-sm">{row.getValue("numero")}</span>
+        <Link
+          href={`/proformas/${row.original.id}`}
+          className="font-mono text-sm hover:underline"
+        >
+          {row.getValue("numero")}
+        </Link>
       ),
     },
     {
       accessorKey: "dateCreation",
       header: "Date",
-      cell: ({ row }) => format(row.getValue("dateCreation"), "dd/MM/yyyy", { locale: fr }),
+      cell: ({ row }) => (
+        <Link
+          href={`/proformas/${row.original.id}`}
+          className="hover:underline"
+        >
+          {format(row.getValue("dateCreation"), "dd/MM/yyyy", { locale: fr })}
+        </Link>
+      ),
     },
     {
       accessorKey: "totalNet",
       header: "Montant",
-      cell: ({ row }) => formatMontant(row.getValue("totalNet")),
+      cell: ({ row }) => (
+        <Link
+          href={`/proformas/${row.original.id}`}
+          className="hover:underline"
+        >
+          {formatMontant(row.getValue("totalNet"))}
+        </Link>
+      ),
     },
     {
       accessorKey: "statut",
       header: "Statut",
       cell: ({ row }) => (
-        <Badge variant={row.getValue("statut") === "VALIDE" ? "default" : "secondary"}>
-          {row.getValue("statut")}
-        </Badge>
-      ),
-    },
-    {
-      id: "actions",
-      cell: ({ row }) => (
-        <Button variant="ghost" size="sm" asChild>
-          <Link href={`/proformas/${row.original.id}`}>
-            <ExternalLink className="h-4 w-4" />
-          </Link>
-        </Button>
+        <Link
+          href={`/proformas/${row.original.id}`}
+          className="inline-block"
+        >
+          <Badge variant={row.getValue("statut") === "VALIDE" ? "default" : "secondary"}>
+            {row.getValue("statut")}
+          </Badge>
+        </Link>
       ),
     },
   ];
@@ -79,36 +93,50 @@ export function ClientDocumentsTabs({ clientId }: ClientDocumentsTabsProps) {
       accessorKey: "numero",
       header: "N°",
       cell: ({ row }) => (
-        <span className="font-mono text-sm">{row.getValue("numero")}</span>
+        <Link
+          href={`/bdc/${row.original.id}`}
+          className="font-mono text-sm hover:underline"
+        >
+          {row.getValue("numero")}
+        </Link>
       ),
     },
     {
       accessorKey: "dateCreation",
       header: "Date",
-      cell: ({ row }) => format(row.getValue("dateCreation"), "dd/MM/yyyy", { locale: fr }),
+      cell: ({ row }) => (
+        <Link
+          href={`/bdc/${row.original.id}`}
+          className="hover:underline"
+        >
+          {format(row.getValue("dateCreation"), "dd/MM/yyyy", { locale: fr })}
+        </Link>
+      ),
     },
     {
       accessorKey: "totalNet",
       header: "Montant",
-      cell: ({ row }) => formatMontant(row.getValue("totalNet")),
+      cell: ({ row }) => (
+        <Link
+          href={`/bdc/${row.original.id}`}
+          className="hover:underline"
+        >
+          {formatMontant(row.getValue("totalNet"))}
+        </Link>
+      ),
     },
     {
       accessorKey: "statut",
       header: "Statut",
       cell: ({ row }) => (
-        <Badge variant={row.getValue("statut") === "APPROUVE" ? "default" : "secondary"}>
-          {row.getValue("statut")}
-        </Badge>
-      ),
-    },
-    {
-      id: "actions",
-      cell: ({ row }) => (
-        <Button variant="ghost" size="sm" asChild>
-          <Link href={`/bdc/${row.original.id}`}>
-            <ExternalLink className="h-4 w-4" />
-          </Link>
-        </Button>
+        <Link
+          href={`/bdc/${row.original.id}`}
+          className="inline-block"
+        >
+          <Badge variant={row.getValue("statut") === "APPROUVE" ? "default" : "secondary"}>
+            {row.getValue("statut")}
+          </Badge>
+        </Link>
       ),
     },
   ];
@@ -119,36 +147,50 @@ export function ClientDocumentsTabs({ clientId }: ClientDocumentsTabsProps) {
       accessorKey: "numero",
       header: "N°",
       cell: ({ row }) => (
-        <span className="font-mono text-sm">{row.getValue("numero")}</span>
+        <Link
+          href={`/bdl/${row.original.id}`}
+          className="font-mono text-sm hover:underline"
+        >
+          {row.getValue("numero")}
+        </Link>
       ),
     },
     {
       accessorKey: "dateLivraison",
       header: "Date livraison",
-      cell: ({ row }) => format(row.getValue("dateLivraison"), "dd/MM/yyyy", { locale: fr }),
+      cell: ({ row }) => (
+        <Link
+          href={`/bdl/${row.original.id}`}
+          className="hover:underline"
+        >
+          {format(row.getValue("dateLivraison"), "dd/MM/yyyy", { locale: fr })}
+        </Link>
+      ),
     },
     {
       accessorKey: "totalNet",
       header: "Montant",
-      cell: ({ row }) => formatMontant(row.getValue("totalNet")),
+      cell: ({ row }) => (
+        <Link
+          href={`/bdl/${row.original.id}`}
+          className="hover:underline"
+        >
+          {formatMontant(row.getValue("totalNet"))}
+        </Link>
+      ),
     },
     {
       accessorKey: "statut",
       header: "Statut",
       cell: ({ row }) => (
-        <Badge variant={row.getValue("statut") === "LIVRE" ? "default" : "secondary"}>
-          {row.getValue("statut")}
-        </Badge>
-      ),
-    },
-    {
-      id: "actions",
-      cell: ({ row }) => (
-        <Button variant="ghost" size="sm" asChild>
-          <Link href={`/bdl/${row.original.id}`}>
-            <ExternalLink className="h-4 w-4" />
-          </Link>
-        </Button>
+        <Link
+          href={`/bdl/${row.original.id}`}
+          className="inline-block"
+        >
+          <Badge variant={row.getValue("statut") === "LIVRE" ? "default" : "secondary"}>
+            {row.getValue("statut")}
+          </Badge>
+        </Link>
       ),
     },
   ];
@@ -159,23 +201,49 @@ export function ClientDocumentsTabs({ clientId }: ClientDocumentsTabsProps) {
       accessorKey: "numero",
       header: "N°",
       cell: ({ row }) => (
-        <span className="font-mono text-sm">{row.getValue("numero")}</span>
+        <Link
+          href={`/factures/${row.original.id}`}
+          className="font-mono text-sm hover:underline"
+        >
+          {row.getValue("numero")}
+        </Link>
       ),
     },
     {
       accessorKey: "dateEmission",
       header: "Date émission",
-      cell: ({ row }) => format(row.getValue("dateEmission"), "dd/MM/yyyy", { locale: fr }),
+      cell: ({ row }) => (
+        <Link
+          href={`/factures/${row.original.id}`}
+          className="hover:underline"
+        >
+          {format(row.getValue("dateEmission"), "dd/MM/yyyy", { locale: fr })}
+        </Link>
+      ),
     },
     {
       accessorKey: "totalNet",
       header: "Montant",
-      cell: ({ row }) => formatMontant(row.getValue("totalNet")),
+      cell: ({ row }) => (
+        <Link
+          href={`/factures/${row.original.id}`}
+          className="hover:underline"
+        >
+          {formatMontant(row.getValue("totalNet"))}
+        </Link>
+      ),
     },
     {
       accessorKey: "soldeRestant",
       header: "Reste dû",
-      cell: ({ row }) => formatMontant(row.getValue("soldeRestant")),
+      cell: ({ row }) => (
+        <Link
+          href={`/factures/${row.original.id}`}
+          className="hover:underline"
+        >
+          {formatMontant(row.getValue("soldeRestant"))}
+        </Link>
+      ),
     },
     {
       accessorKey: "statut",
@@ -183,18 +251,15 @@ export function ClientDocumentsTabs({ clientId }: ClientDocumentsTabsProps) {
       cell: ({ row }) => {
         const statut = row.getValue("statut") as string;
         const variant = statut === "PAYEE" ? "default" : statut === "EMISE" ? "secondary" : "outline";
-        return <Badge variant={variant}>{statut}</Badge>;
-      },
-    },
-    {
-      id: "actions",
-      cell: ({ row }) => (
-        <Button variant="ghost" size="sm" asChild>
-          <Link href={`/factures/${row.original.id}`}>
-            <ExternalLink className="h-4 w-4" />
+        return (
+          <Link
+            href={`/factures/${row.original.id}`}
+            className="inline-block"
+          >
+            <Badge variant={variant}>{statut}</Badge>
           </Link>
-        </Button>
-      ),
+        );
+      },
     },
   ];
 
