@@ -16,6 +16,9 @@ import { createUserAction, updateUserAction, deleteUserAction } from "@/lib/acti
 
 import { CreateUserInput, UpdateUserInput } from "@/lib/schemas/user-schema";
 
+// Re-export types for convenience
+export type { CreateUserInput, UpdateUserInput };
+
 export interface User {
   id: string;
   email: string;

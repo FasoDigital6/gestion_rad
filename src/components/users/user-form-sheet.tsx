@@ -9,8 +9,9 @@ import { SheetFooter } from "@/components/ui/sheet";
 import { Slider } from "@/components/ui/slider";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import { Loader2 } from "lucide-react";
-import { useCreateUser } from "@/lib/hooks/use-users";
+import { useCreateUser, useUpdateUser } from "@/lib/hooks/use-users";
 import { createUserSchema, CreateUserInput } from "@/lib/schemas/user-schema";
+import { User } from "@/lib/firebase/api/users";
 import { toast } from "sonner";
 
 type UserFormValues = CreateUserInput;
@@ -18,20 +19,24 @@ type UserFormValues = CreateUserInput;
 interface UserFormSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  user?: User | null;
 }
 
 export function UserFormSheet({
   open,
   onOpenChange,
+  user,
 }: UserFormSheetProps) {
   const createUserMutation = useCreateUser();
+  const updateUserMutation = useUpdateUser();
+  const isEditing = !!user;
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-  } = useForm<UserFormValues>({
+  } = useForm({
     resolver: zodResolver(createUserSchema),
     defaultValues: {
       nom: "",
@@ -44,20 +49,44 @@ export function UserFormSheet({
   });
 
   useEffect(() => {
-    if (!open) {
-      reset();
+    if (open && user) {
+      reset({
+        nom: user.nom,
+        prenom: user.prenom,
+        email: user.email,
+        telephone: user.telephone || "",
+        poste: user.poste || "",
+        adresse: user.adresse || "",
+      });
+    } else if (!open) {
+      reset({
+        nom: "",
+        prenom: "",
+        email: "",
+        telephone: "",
+        poste: "",
+        adresse: "",
+      });
     }
-  }, [open, reset]);
+  }, [open, user, reset]);
 
   const onSubmit = async (data: UserFormValues) => {
     try {
-      await createUserMutation.mutateAsync(data);
-      toast.success("Utilisateur créé avec succès. Un email a été envoyé à l'utilisateur.");
+      if (isEditing && user) {
+        await updateUserMutation.mutateAsync({
+          id: user.id,
+          ...data,
+        });
+        toast.success("Utilisateur modifié avec succès.");
+      } else {
+        await createUserMutation.mutateAsync(data);
+        toast.success("Utilisateur créé avec succès. Un email a été envoyé à l'utilisateur.");
+      }
       onOpenChange(false);
       reset();
     } catch (error: any) {
-      console.error("Erreur lors de la création de l'utilisateur:", error);
-      toast.error(error.message || "Erreur lors de la création de l'utilisateur");
+      console.error(`Erreur lors de la ${isEditing ? 'modification' : 'création'} de l'utilisateur:`, error);
+      toast.error(error.message || `Erreur lors de la ${isEditing ? 'modification' : 'création'} de l'utilisateur`);
     }
   };
 
@@ -65,8 +94,8 @@ export function UserFormSheet({
     <Slider
       isOpen={open}
       onClose={() => onOpenChange(false)}
-      title="Nouvel utilisateur"
-      description="Créez un nouveau compte utilisateur. Un email sera envoyé pour définir le mot de passe."
+      title={isEditing ? "Modifier l'utilisateur" : "Nouvel utilisateur"}
+      description={isEditing ? "Modifiez les informations de l'utilisateur." : "Créez un nouveau compte utilisateur. Un email sera envoyé pour définir le mot de passe."}
       size="sm:max-w-[540px]"
     >
       <form
@@ -159,12 +188,14 @@ export function UserFormSheet({
               {errors.adresse && <FieldError errors={[errors.adresse]} />}
             </Field>
 
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-sm text-blue-800">
-                <strong>Note :</strong> Après la création, Firebase enverra automatiquement
-                un email à l'utilisateur avec un lien pour définir son mot de passe.
-              </p>
-            </div>
+            {!isEditing && (
+              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  <strong>Note :</strong> Après la création, Firebase enverra automatiquement
+                  un email à l'utilisateur avec un lien pour définir son mot de passe.
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -186,10 +217,10 @@ export function UserFormSheet({
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Création...
+                {isEditing ? "Modification..." : "Création..."}
               </>
             ) : (
-              "Créer l'utilisateur"
+              isEditing ? "Modifier l'utilisateur" : "Créer l'utilisateur"
             )}
           </Button>
         </SheetFooter>

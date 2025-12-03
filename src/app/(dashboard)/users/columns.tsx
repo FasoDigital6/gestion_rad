@@ -4,11 +4,20 @@ import { ColumnDef } from "@tanstack/react-table";
 import { User } from "@/lib/firebase/api/users";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, Mail, Phone, Briefcase, Trash2 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import { Eye, Mail, Phone, Briefcase, Trash2, Edit, MoreHorizontal, UserCheck, UserX } from "lucide-react";
 
 export const createColumns = (
   onViewUser: (user: User) => void,
-  onDeleteUser: (user: User) => void
+  onEditUser: (user: User) => void,
+  onDeleteUser: (user: User) => void,
+  onToggleStatus: (user: User) => void
 ): ColumnDef<User>[] => [
   {
     accessorKey: "nom",
@@ -17,7 +26,10 @@ export const createColumns = (
       const user = row.original;
       const fullName = `${user.prenom} ${user.nom}`;
       return (
-        <div>
+        <div
+          className="cursor-pointer hover:opacity-80 transition-opacity"
+          onClick={() => onViewUser(user)}
+        >
           <div className="font-medium">{fullName}</div>
           <div className="text-sm text-muted-foreground flex items-center gap-1">
             <Mail className="h-3 w-3" />
@@ -97,24 +109,49 @@ export const createColumns = (
     cell: ({ row }) => {
       const user = row.original;
       return (
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onViewUser(user)}
-            className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-          >
-            <Eye className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onDeleteUser(user)}
-            className="text-red-600 hover:text-red-700 hover:bg-red-50"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0"
+            >
+              <MoreHorizontal className="h-4 w-4" />
+              <span className="sr-only">Ouvrir le menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem onClick={() => onViewUser(user)}>
+              <Eye className="mr-2 h-4 w-4" />
+              Voir les détails
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => onEditUser(user)}>
+              <Edit className="mr-2 h-4 w-4" />
+              Modifier
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onToggleStatus(user)}>
+              {user.disabled ? (
+                <>
+                  <UserCheck className="mr-2 h-4 w-4" />
+                  Activer
+                </>
+              ) : (
+                <>
+                  <UserX className="mr-2 h-4 w-4" />
+                  Désactiver
+                </>
+              )}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              variant="destructive"
+              onClick={() => onDeleteUser(user)}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Supprimer
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       );
     },
   },

@@ -1,40 +1,72 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { FileText, Search, Plus } from "lucide-react";
+import { Plus, FileText } from "lucide-react";
 import { useBdcs } from "@/lib/hooks/use-bdc";
+import { useClients } from "@/lib/hooks/use-clients";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import Link from "next/link";
-import { format } from "date-fns";
-import { fr } from "date-fns/locale";
-import { getBdcStatusStyle, getBdcStatusLabel } from "@/lib/utils/bdc";
 import { BdcStatut } from "@/lib/types/bdc";
 import { BdcFormSheet } from "@/components/bdc/bdc-form-sheet";
 import { DataTable } from "@/components/data-table/data-table";
 import { createColumns } from "./columns-wrapper";
+import { useDataFilters } from "@/lib/hooks/use-data-filters";
+import {
+  DataTableFilters,
+  ClientFilter,
+  StatusFilter,
+  PeriodFilter,
+} from "@/components/filters";
+import { BDC_STATUS_OPTIONS } from "@/lib/constants/status-options";
 
 export default function BdcPage() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState<BdcStatut | "all">("all");
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   const { data: bdcs, isLoading, error } = useBdcs();
+  const { data: clients } = useClients();
+
+  const {
+    filters,
+    setFilter,
+    clearAllFilters,
+    hasActiveFilters,
+    activeFiltersCount,
+  } = useDataFilters();
 
   // Filtrer les BDCs
-  const filteredBdcs = bdcs?.filter((bdc) => {
-    const matchesSearch =
-      searchTerm === "" ||
-      bdc.numero.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      bdc.clientNom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (bdc.proformaNumero &&
-        bdc.proformaNumero.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filteredBdcs = useMemo(() => {
+    return bdcs?.filter((bdc) => {
+      // Filtre par client
+      if (filters.client && bdc.clientId !== filters.client) {
+        return false;
+      }
 
-    const matchesStatus = filterStatus === "all" || bdc.statut === filterStatus;
+      // Filtre par statut
+      if (filters.status) {
+        const statusMap: Record<string, BdcStatut> = {
+          brouillon: "BROUILLON",
+          approuve: "APPROUVE",
+          annule: "ANNULE",
+        };
+        if (bdc.statut !== statusMap[filters.status]) {
+          return false;
+        }
+      }
 
-    return matchesSearch && matchesStatus;
-  });
+      // Filtre par période
+      if (filters.period && bdc.dateCommande) {
+        const bdcDate = new Date(bdc.dateCommande);
+        if (filters.period.startDate && bdcDate < filters.period.startDate) {
+          return false;
+        }
+        if (filters.period.endDate && bdcDate > filters.period.endDate) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [bdcs, filters]);
 
   // Calculer les stats
   const stats = {
@@ -83,13 +115,7 @@ export default function BdcPage() {
 
       {/* Stats Cards */}
       <div className="grid gap-6 md:grid-cols-4 mb-8">
-        <Card
-          className={`cursor-pointer transition-all ${filterStatus === "BROUILLON" ? "ring-2 ring-brand" : ""
-            }`}
-          onClick={() =>
-            setFilterStatus(filterStatus === "BROUILLON" ? "all" : "BROUILLON")
-          }
-        >
+        <Card>
           <CardContent className="p-6">
             <p className="text-sm font-medium text-gray-600">Brouillons</p>
             <p className="text-3xl font-bold text-gray-900 mt-2">
@@ -98,13 +124,7 @@ export default function BdcPage() {
           </CardContent>
         </Card>
 
-        <Card
-          className={`cursor-pointer transition-all ${filterStatus === "ENVOYE" ? "ring-2 ring-brand" : ""
-            }`}
-          onClick={() =>
-            setFilterStatus(filterStatus === "ENVOYE" ? "all" : "ENVOYE")
-          }
-        >
+        <Card>
           <CardContent className="p-6">
             <p className="text-sm font-medium text-gray-600">Envoyés</p>
             <p className="text-3xl font-bold text-brand mt-2">
@@ -113,13 +133,7 @@ export default function BdcPage() {
           </CardContent>
         </Card>
 
-        <Card
-          className={`cursor-pointer transition-all ${filterStatus === "APPROUVE" ? "ring-2 ring-brand" : ""
-            }`}
-          onClick={() =>
-            setFilterStatus(filterStatus === "APPROUVE" ? "all" : "APPROUVE")
-          }
-        >
+        <Card>
           <CardContent className="p-6">
             <p className="text-sm font-medium text-gray-600">Approuvés</p>
             <p className="text-3xl font-bold text-green-600 mt-2">
@@ -128,13 +142,7 @@ export default function BdcPage() {
           </CardContent>
         </Card>
 
-        <Card
-          className={`cursor-pointer transition-all ${filterStatus === "ANNULE" ? "ring-2 ring-brand" : ""
-            }`}
-          onClick={() =>
-            setFilterStatus(filterStatus === "ANNULE" ? "all" : "ANNULE")
-          }
-        >
+        <Card>
           <CardContent className="p-6">
             <p className="text-sm font-medium text-gray-600">Annulés</p>
             <p className="text-3xl font-bold text-red-600 mt-2">
@@ -144,26 +152,32 @@ export default function BdcPage() {
         </Card>
       </div>
 
-      {/* Filtres et recherche */}
+      {/* Filtres */}
       <Card className="mb-6">
         <CardContent className="p-6">
-          <div className="flex gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Rechercher par numéro, client ou proforma..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            {filterStatus !== "all" && (
-              <Button variant="outline" onClick={() => setFilterStatus("all")}>
-                Réinitialiser les filtres
-              </Button>
-            )}
-          </div>
+          <DataTableFilters
+            onClearAll={clearAllFilters}
+            hasActiveFilters={hasActiveFilters}
+            activeFiltersCount={activeFiltersCount}
+          >
+            <ClientFilter
+              clients={clients || []}
+              value={filters.client || null}
+              onChange={(value) => setFilter("client", value)}
+              placeholder="Tous les clients"
+            />
+            <StatusFilter
+              options={BDC_STATUS_OPTIONS}
+              value={filters.status || null}
+              onChange={(value) => setFilter("status", value)}
+              placeholder="Tous les statuts"
+            />
+            <PeriodFilter
+              value={filters.period || null}
+              onChange={(value) => setFilter("period", value)}
+              placeholder="Toutes les périodes"
+            />
+          </DataTableFilters>
         </CardContent>
       </Card>
 

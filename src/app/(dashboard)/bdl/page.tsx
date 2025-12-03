@@ -1,40 +1,72 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Truck, Search } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Truck } from "lucide-react";
 import { useBdls } from "@/lib/hooks/use-bdl";
+import { useClients } from "@/lib/hooks/use-clients";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import Link from "next/link";
-import { format } from "date-fns";
-import { fr } from "date-fns/locale";
-import { getBdlStatusStyle, getBdlStatusLabel } from "@/lib/utils/bdl";
 import { BdlStatut } from "@/lib/types/bdl";
-import { Badge } from "@/components/ui/badge";
 import { BdlSelectionTable } from "@/components/bdl/bdl-selection-table";
 import { FactureFormSheet } from "@/components/facture/facture-form-sheet";
+import { useDataFilters } from "@/lib/hooks/use-data-filters";
+import {
+  DataTableFilters,
+  ClientFilter,
+  StatusFilter,
+  PeriodFilter,
+} from "@/components/filters";
+import { BDL_STATUS_OPTIONS } from "@/lib/constants/status-options";
 
 export default function BdlPage() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState<BdlStatut | "all">("all");
   const [selectedBdlIds, setSelectedBdlIds] = useState<string[]>([]);
   const [isFactureFormOpen, setIsFactureFormOpen] = useState(false);
 
   const { data: bdls, isLoading, error } = useBdls();
+  const { data: clients } = useClients();
+
+  const {
+    filters,
+    setFilter,
+    clearAllFilters,
+    hasActiveFilters,
+    activeFiltersCount,
+  } = useDataFilters();
 
   // Filtrer les BDLs
-  const filteredBdls = bdls?.filter((bdl) => {
-    const matchesSearch =
-      searchTerm === "" ||
-      bdl.numero.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      bdl.clientNom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      bdl.bdcNumero.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredBdls = useMemo(() => {
+    return bdls?.filter((bdl) => {
+      // Filtre par client
+      if (filters.client && bdl.clientId !== filters.client) {
+        return false;
+      }
 
-    const matchesStatus = filterStatus === "all" || bdl.statut === filterStatus;
+      // Filtre par statut
+      if (filters.status) {
+        const statusMap: Record<string, BdlStatut> = {
+          brouillon: "BROUILLON",
+          en_route: "EN_ROUTE",
+          livre: "LIVRE",
+          annule: "ANNULE",
+        };
+        if (bdl.statut !== statusMap[filters.status]) {
+          return false;
+        }
+      }
 
-    return matchesSearch && matchesStatus;
-  });
+      // Filtre par période
+      if (filters.period && bdl.dateLivraison) {
+        const bdlDate = new Date(bdl.dateLivraison);
+        if (filters.period.startDate && bdlDate < filters.period.startDate) {
+          return false;
+        }
+        if (filters.period.endDate && bdlDate > filters.period.endDate) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [bdls, filters]);
 
   // Calculer les stats
   const stats = {
@@ -126,47 +158,32 @@ export default function BdlPage() {
         </Card>
       </div>
 
-      {/* Search and Filters */}
+      {/* Filtres */}
       <Card className="mb-6">
         <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                type="text"
-                placeholder="Rechercher par numéro, client, ou BDC..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-
-            <select
-              value={filterStatus}
-              onChange={(e) =>
-                setFilterStatus(e.target.value as BdlStatut | "all")
-              }
-              className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand"
-            >
-              <option value="all">Tous les statuts</option>
-              <option value="BROUILLON">Brouillon</option>
-              <option value="EN_ROUTE">En route</option>
-              <option value="LIVRE">Livré</option>
-              <option value="ANNULE">Annulé</option>
-            </select>
-
-            {(searchTerm || filterStatus !== "all") && (
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setSearchTerm("");
-                  setFilterStatus("all");
-                }}
-              >
-                Réinitialiser
-              </Button>
-            )}
-          </div>
+          <DataTableFilters
+            onClearAll={clearAllFilters}
+            hasActiveFilters={hasActiveFilters}
+            activeFiltersCount={activeFiltersCount}
+          >
+            <ClientFilter
+              clients={clients || []}
+              value={filters.client || null}
+              onChange={(value) => setFilter("client", value)}
+              placeholder="Tous les clients"
+            />
+            <StatusFilter
+              options={BDL_STATUS_OPTIONS}
+              value={filters.status || null}
+              onChange={(value) => setFilter("status", value)}
+              placeholder="Tous les statuts"
+            />
+            <PeriodFilter
+              value={filters.period || null}
+              onChange={(value) => setFilter("period", value)}
+              placeholder="Toutes les périodes"
+            />
+          </DataTableFilters>
         </CardContent>
       </Card>
 

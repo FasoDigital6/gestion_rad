@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { SheetFooter } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, UserCheck, UserX, Mail, Phone, MapPin, Briefcase } from "lucide-react";
+import { Loader2, UserCheck, UserX, Mail, Phone, MapPin, Briefcase, Edit, Trash2 } from "lucide-react";
 import { useToggleUserStatus } from "@/lib/hooks/use-users";
 import { User } from "@/lib/firebase/api/users";
 import { toast } from "sonner";
@@ -13,12 +13,16 @@ interface UserDetailsSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   user: User | null;
+  onEdit?: (user: User) => void;
+  onDelete?: (user: User) => void;
 }
 
 export function UserDetailsSheet({
   open,
   onOpenChange,
   user,
+  onEdit,
+  onDelete,
 }: UserDetailsSheetProps) {
   const toggleStatusMutation = useToggleUserStatus();
 
@@ -184,7 +188,37 @@ export function UserDetailsSheet({
           </div>
         </div>
 
-        <SheetFooter className="py-5 px-6 border-t border-border bg-background gap-3 flex-row justify-end">
+        <SheetFooter className="py-5 px-6 border-t border-border bg-background gap-3 flex-row justify-between">
+          <div className="flex gap-3">
+            {onEdit && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  onEdit(user);
+                  onOpenChange(false);
+                }}
+                className="h-11 px-6 gap-2"
+              >
+                <Edit className="h-4 w-4" />
+                Modifier
+              </Button>
+            )}
+            {onDelete && (
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={() => {
+                  onDelete(user);
+                  onOpenChange(false);
+                }}
+                className="h-11 px-6 gap-2"
+              >
+                <Trash2 className="h-4 w-4" />
+                Supprimer
+              </Button>
+            )}
+          </div>
           <Button
             type="button"
             variant="outline"

@@ -6,7 +6,7 @@ import { createColumns } from "./columns";
 import { User } from "@/lib/firebase/api/users";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { useUsers, useDeleteUser } from "@/lib/hooks/use-users";
+import { useUsers, useDeleteUser, useToggleUserStatus } from "@/lib/hooks/use-users";
 import { UserFormSheet } from "@/components/users/user-form-sheet";
 import { UserDetailsSheet } from "@/components/users/user-details-sheet";
 import { toast } from "sonner";
@@ -26,11 +26,15 @@ export default function UsersPage() {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [returnToDetails, setReturnToDetails] = useState(false);
 
   const { data: users, isLoading, error } = useUsers();
   const deleteUserMutation = useDeleteUser();
+  const toggleStatusMutation = useToggleUserStatus();
 
   const handleAddUser = () => {
+    setSelectedUser(null);
+    setReturnToDetails(false);
     setIsFormOpen(true);
   };
 
@@ -39,8 +43,31 @@ export default function UsersPage() {
     setIsDetailsOpen(true);
   };
 
+  const handleEditUser = (user: User, fromDetails = false) => {
+    setSelectedUser(user);
+    setReturnToDetails(fromDetails);
+    setIsFormOpen(true);
+  };
+
   const handleDeleteUser = (user: User) => {
     setUserToDelete(user);
+  };
+
+  const handleToggleStatus = async (user: User) => {
+    try {
+      await toggleStatusMutation.mutateAsync({
+        id: user.id,
+        disabled: !user.disabled,
+      });
+      toast.success(
+        user.disabled
+          ? "Utilisateur activé avec succès"
+          : "Utilisateur désactivé avec succès"
+      );
+    } catch (error: any) {
+      console.error("Erreur lors du changement de statut:", error);
+      toast.error(error.message || "Erreur lors du changement de statut");
+    }
   };
 
   const confirmDeleteUser = async () => {
@@ -56,7 +83,7 @@ export default function UsersPage() {
     }
   };
 
-  const columns = useMemo(() => createColumns(handleViewUser, handleDeleteUser), []);
+  const columns = useMemo(() => createColumns(handleViewUser, handleEditUser, handleDeleteUser, handleToggleStatus), []);
 
   return (
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
@@ -94,13 +121,31 @@ export default function UsersPage() {
 
       <UserFormSheet
         open={isFormOpen}
-        onOpenChange={setIsFormOpen}
+        onOpenChange={(open) => {
+          setIsFormOpen(open);
+          if (!open) {
+            setSelectedUser(null);
+            if (returnToDetails && selectedUser) {
+              // Rouvrir le modal de détails après la fermeture du formulaire
+              setTimeout(() => {
+                setIsDetailsOpen(true);
+              }, 100);
+            }
+            setReturnToDetails(false);
+          }
+        }}
+        user={selectedUser}
       />
 
       <UserDetailsSheet
         open={isDetailsOpen}
         onOpenChange={setIsDetailsOpen}
         user={selectedUser}
+        onEdit={(user) => {
+          setIsDetailsOpen(false);
+          handleEditUser(user, true);
+        }}
+        onDelete={handleDeleteUser}
       />
 
       <AlertDialog open={!!userToDelete} onOpenChange={(open) => !open && setUserToDelete(null)}>

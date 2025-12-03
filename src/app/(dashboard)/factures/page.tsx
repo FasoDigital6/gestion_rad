@@ -1,45 +1,74 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { FileText, Search, Plus } from "lucide-react";
+import { FileText, Plus } from "lucide-react";
 import { useFactures } from "@/lib/hooks/use-facture";
+import { useClients } from "@/lib/hooks/use-clients";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import Link from "next/link";
-import { format } from "date-fns";
-import { fr } from "date-fns/locale";
-import {
-  getFactureStatusLabel,
-  getFactureStatusStyle,
-  formatMontant,
-} from "@/lib/utils/facture";
+import { formatMontant } from "@/lib/utils/facture";
 import type { FactureStatut } from "@/lib/types/facture";
 import { FactureFormSheet } from "@/components/facture/facture-form-sheet";
 import { DataTable } from "@/components/data-table/data-table";
 import { createColumns } from "./columns-wrapper";
+import { useDataFilters } from "@/lib/hooks/use-data-filters";
+import {
+  DataTableFilters,
+  ClientFilter,
+  StatusFilter,
+  PeriodFilter,
+} from "@/components/filters";
+import { FACTURE_STATUS_OPTIONS } from "@/lib/constants/status-options";
 
 export default function FacturesPage() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState<FactureStatut | "all">(
-    "all"
-  );
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [formMode, setFormMode] = useState<"bdl" | "manual">("manual");
 
   const { data: factures = [], isLoading, error } = useFactures();
+  const { data: clients } = useClients();
 
-  // Filtrage
-  const filteredFactures = factures.filter((facture) => {
-    const matchesSearch =
-      facture.numero.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      facture.clientNom.toLowerCase().includes(searchTerm.toLowerCase());
+  const {
+    filters,
+    setFilter,
+    clearAllFilters,
+    hasActiveFilters,
+    activeFiltersCount,
+  } = useDataFilters();
 
-    const matchesStatus =
-      filterStatus === "all" || facture.statut === filterStatus;
+  // Filtrer les factures
+  const filteredFactures = useMemo(() => {
+    return factures?.filter((facture) => {
+      // Filtre par client
+      if (filters.client && facture.clientId !== filters.client) {
+        return false;
+      }
 
-    return matchesSearch && matchesStatus;
-  });
+      // Filtre par statut
+      if (filters.status) {
+        const statusMap: Record<string, FactureStatut> = {
+          emise: "EMISE",
+          partiel: "PAYEE_PARTIELLE",
+          paye: "PAYEE",
+        };
+        if (facture.statut !== statusMap[filters.status]) {
+          return false;
+        }
+      }
+
+      // Filtre par période
+      if (filters.period && facture.dateEmission) {
+        const factureDate = new Date(facture.dateEmission);
+        if (filters.period.startDate && factureDate < filters.period.startDate) {
+          return false;
+        }
+        if (filters.period.endDate && factureDate > filters.period.endDate) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [factures, filters]);
 
   // Statistiques
   const stats = {
@@ -159,67 +188,30 @@ export default function FacturesPage() {
 
       {/* Filtres */}
       <Card className="mb-6">
-        <CardContent className="pt-6">
-          <div className="flex flex-col sm:flex-row gap-4">
-            {/* Recherche */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder="Rechercher par numéro ou client..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-
-            {/* Filtre statut */}
-            <div className="flex gap-2 flex-wrap">
-              <Button
-                variant={filterStatus === "all" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setFilterStatus("all")}
-                className={
-                  filterStatus === "all" ? "bg-brand hover:bg-brand/90" : ""
-                }
-              >
-                Toutes ({stats.total})
-              </Button>
-              <Button
-                variant={filterStatus === "EMISE" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setFilterStatus("EMISE")}
-                className={
-                  filterStatus === "EMISE" ? "bg-brand hover:bg-brand/90" : ""
-                }
-              >
-                Émises ({stats.emises})
-              </Button>
-              <Button
-                variant={
-                  filterStatus === "PAYEE_PARTIELLE" ? "default" : "outline"
-                }
-                size="sm"
-                onClick={() => setFilterStatus("PAYEE_PARTIELLE")}
-                className={
-                  filterStatus === "PAYEE_PARTIELLE"
-                    ? "bg-brand hover:bg-brand/90"
-                    : ""
-                }
-              >
-                Partielles ({stats.payeesPartielles})
-              </Button>
-              <Button
-                variant={filterStatus === "PAYEE" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setFilterStatus("PAYEE")}
-                className={
-                  filterStatus === "PAYEE" ? "bg-brand hover:bg-brand/90" : ""
-                }
-              >
-                Payées ({stats.payees})
-              </Button>
-            </div>
-          </div>
+        <CardContent className="p-6">
+          <DataTableFilters
+            onClearAll={clearAllFilters}
+            hasActiveFilters={hasActiveFilters}
+            activeFiltersCount={activeFiltersCount}
+          >
+            <ClientFilter
+              clients={clients || []}
+              value={filters.client || null}
+              onChange={(value) => setFilter("client", value)}
+              placeholder="Tous les clients"
+            />
+            <StatusFilter
+              options={FACTURE_STATUS_OPTIONS}
+              value={filters.status || null}
+              onChange={(value) => setFilter("status", value)}
+              placeholder="Tous les statuts"
+            />
+            <PeriodFilter
+              value={filters.period || null}
+              onChange={(value) => setFilter("period", value)}
+              placeholder="Toutes les périodes"
+            />
+          </DataTableFilters>
         </CardContent>
       </Card>
 
@@ -244,7 +236,7 @@ export default function FacturesPage() {
                 Aucune facture
               </h3>
               <p className="mt-1 text-sm text-gray-500">
-                {searchTerm || filterStatus !== "all"
+                {hasActiveFilters
                   ? "Aucune facture ne correspond aux critères de recherche"
                   : "Commencez par créer votre première facture"}
               </p>
