@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { toast } from "sonner";
 import { useDashboardStats } from "@/lib/hooks/use-dashboard-stats";
 import { formatMontant } from "@/lib/utils/dashboard";
 import { StatsCard } from "@/components/dashboard/stats-card";
@@ -20,6 +22,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { TrendingUp, Receipt, DollarSign, AlertCircle, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { ClientFormSheet } from "@/components/clients/client-form-sheet";
+import { ProformaFormSheet } from "@/components/proformas/proforma-form-sheet";
+import { BdcFormSheet } from "@/components/bdc/bdc-form-sheet";
+import { BdlFormSheet } from "@/components/bdl/bdl-form-sheet";
+import { FactureFormSheet } from "@/components/facture/facture-form-sheet";
 
 export default function DashboardPage() {
   const {
@@ -33,6 +40,13 @@ export default function DashboardPage() {
   } = useDashboardStats();
 
   const router = useRouter();
+
+  // États pour gérer l'ouverture des modals
+  const [isClientFormOpen, setIsClientFormOpen] = useState(false);
+  const [isProformaFormOpen, setIsProformaFormOpen] = useState(false);
+  const [isBdcFormOpen, setIsBdcFormOpen] = useState(false);
+  const [isBdlFormOpen, setIsBdlFormOpen] = useState(false);
+  const [isFactureFormOpen, setIsFactureFormOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -96,25 +110,25 @@ export default function DashboardPage() {
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button className="gap-2">
+            <Button className="gap-2 bg-blue-600 hover:bg-blue-700 text-white">
               <Plus className="h-4 w-4" />
               Actions rapides
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuItem onClick={() => router.push("/clients")}>
+            <DropdownMenuItem onClick={() => setIsClientFormOpen(true)}>
               Nouveau client
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => router.push("/proformas")}>
+            <DropdownMenuItem onClick={() => setIsProformaFormOpen(true)}>
               Nouvelle proforma
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => router.push("/bdc")}>
+            <DropdownMenuItem onClick={() => setIsBdcFormOpen(true)}>
               Nouveau bon de commande
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => router.push("/bdl")}>
+            <DropdownMenuItem onClick={() => setIsBdlFormOpen(true)}>
               Nouveau bon de livraison
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => router.push("/factures")}>
+            <DropdownMenuItem onClick={() => setIsFactureFormOpen(true)}>
               Nouvelle facture
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -276,6 +290,71 @@ export default function DashboardPage() {
           <RecentInvoicesTable factures={recentData.factures} />
         </div>
       </div>
+
+      {/* Modals de création */}
+      <ClientFormSheet
+        open={isClientFormOpen}
+        onOpenChange={setIsClientFormOpen}
+        client={null}
+        onClientCreated={(clientId) => {
+          toast.success("Client créé avec succès", {
+            action: {
+              label: "Voir détails",
+              onClick: () => router.push(`/clients/${clientId}`),
+            },
+          });
+        }}
+      />
+
+      <ProformaFormSheet
+        open={isProformaFormOpen}
+        onOpenChange={setIsProformaFormOpen}
+        proforma={null}
+        onProformaCreated={(proformaId) => {
+          toast.success("Proforma créée avec succès", {
+            action: {
+              label: "Voir détails",
+              onClick: () => router.push(`/proformas/${proformaId}`),
+            },
+          });
+        }}
+      />
+
+      <BdcFormSheet
+        open={isBdcFormOpen}
+        onOpenChange={setIsBdcFormOpen}
+        bdc={null}
+        onBdcCreated={(bdcId) => {
+          toast.success("Bon de commande créé avec succès", {
+            action: {
+              label: "Voir détails",
+              onClick: () => router.push(`/bdc/${bdcId}`),
+            },
+          });
+        }}
+      />
+
+      {/* BdlFormSheet nécessite un BDC existant, ne peut pas être créé depuis le dashboard */}
+      {/* <BdlFormSheet
+        open={isBdlFormOpen}
+        onOpenChange={setIsBdlFormOpen}
+        bdc={null}
+      /> */}
+
+      <FactureFormSheet
+        open={isFactureFormOpen}
+        onOpenChange={setIsFactureFormOpen}
+        mode="manual"
+        facture={null}
+        onFactureCreated={(factureId) => {
+          toast.success("Facture créée avec succès", {
+            action: {
+              label: "Voir détails",
+              onClick: () => router.push(`/factures/${factureId}`),
+            },
+          });
+        }}
+      />
     </div>
   );
 }

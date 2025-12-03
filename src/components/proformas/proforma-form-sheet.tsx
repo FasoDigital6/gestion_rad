@@ -64,12 +64,14 @@ interface ProformaFormSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   proforma?: Proforma | null;
+  onProformaCreated?: (proformaId: string) => void;
 }
 
 export function ProformaFormSheet({
   open,
   onOpenChange,
   proforma,
+  onProformaCreated,
 }: ProformaFormSheetProps) {
   const isEditing = !!proforma;
   const createMutation = useCreateProforma();
@@ -167,10 +169,13 @@ export function ProformaFormSheet({
           clientNom,
         });
       } else {
-        await createMutation.mutateAsync({
+        const proformaId = await createMutation.mutateAsync({
           ...data,
           clientNom,
         });
+        if (onProformaCreated && proformaId) {
+          onProformaCreated(proformaId);
+        }
       }
       onOpenChange(false);
       reset();

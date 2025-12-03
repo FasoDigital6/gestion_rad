@@ -51,9 +51,10 @@ interface BdcFormSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   bdc?: Bdc | null;
+  onBdcCreated?: (bdcId: string) => void;
 }
 
-export function BdcFormSheet({ open, onOpenChange, bdc }: BdcFormSheetProps) {
+export function BdcFormSheet({ open, onOpenChange, bdc, onBdcCreated }: BdcFormSheetProps) {
   const isEditing = !!bdc;
   const createMutation = useCreateBdc();
   const updateMutation = useUpdateBdc();
@@ -166,10 +167,13 @@ export function BdcFormSheet({ open, onOpenChange, bdc }: BdcFormSheetProps) {
           clientNom,
         });
       } else {
-        await createMutation.mutateAsync({
+        const bdcId = await createMutation.mutateAsync({
           ...data,
           clientNom,
         });
+        if (onBdcCreated && bdcId) {
+          onBdcCreated(bdcId);
+        }
       }
       onOpenChange(false);
       reset();

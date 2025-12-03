@@ -84,6 +84,7 @@ interface FactureFormSheetProps {
   mode: "bdl" | "manual";
   selectedBdls?: Bdl[];
   facture?: Facture | null;
+  onFactureCreated?: (factureId: string) => void;
 }
 
 export function FactureFormSheet({
@@ -92,6 +93,7 @@ export function FactureFormSheet({
   mode,
   selectedBdls = [],
   facture,
+  onFactureCreated,
 }: FactureFormSheetProps) {
   const isEditing = !!facture;
   const createFromBdlsMutation = useCreateFactureFromBdls();
@@ -236,8 +238,10 @@ export function FactureFormSheet({
 
   const onSubmit = async (data: FactureFormValues) => {
     try {
+      let factureId: string | undefined;
+
       if (data.mode === "bdl") {
-        await createFromBdlsMutation.mutateAsync({
+        factureId = await createFromBdlsMutation.mutateAsync({
           bdlIds: data.bdlIds!,
           dateEmission: data.dateEmission,
           dateEcheance: data.dateEcheance,
@@ -248,7 +252,7 @@ export function FactureFormSheet({
           fournisseur: data.fournisseur,
         });
       } else {
-        await createManualMutation.mutateAsync({
+        factureId = await createManualMutation.mutateAsync({
           clientId: data.clientId!,
           clientNom,
           dateEmission: data.dateEmission,
@@ -260,6 +264,10 @@ export function FactureFormSheet({
           lieu: data.lieu,
           fournisseur: data.fournisseur,
         });
+      }
+
+      if (onFactureCreated && factureId) {
+        onFactureCreated(factureId);
       }
       onOpenChange(false);
       reset();

@@ -233,7 +233,7 @@ export async function createProforma(
     const proformasRef = collection(db, PROFORMAS_COLLECTION_NAME);
     const docRef = await addDoc(proformasRef, {
       numero,
-      numeroDA: proformaData.numeroDA,
+      numeroDA: proformaData.numeroDA || null,
       clientId: proformaData.clientId,
       clientNom: proformaData.clientNom,
       dateLivraison: proformaData.dateLivraison,
