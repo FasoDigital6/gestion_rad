@@ -116,7 +116,7 @@ export function PeriodFilter({
           Cette année
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <Popover open={showCustom} onOpenChange={setShowCustom}>
+        <Popover open={showCustom} onOpenChange={setShowCustom} modal={true}>
           <PopoverTrigger asChild>
             <DropdownMenuItem
               onSelect={(e) => {
@@ -130,6 +130,13 @@ export function PeriodFilter({
           <PopoverContent
             className="w-auto p-0"
             align="start"
+            onInteractOutside={(e) => {
+              // Empêcher la fermeture si on clique sur le calendrier
+              const target = e.target as HTMLElement;
+              if (target.closest('[role="dialog"]')) {
+                e.preventDefault();
+              }
+            }}
           >
             <CalendarComponent
               mode="range"

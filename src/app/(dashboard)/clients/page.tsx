@@ -36,7 +36,7 @@ export default function ClientsPage() {
             Gérez votre base clients et consultez leur historique
           </p>
         </div>
-        <Button onClick={handleAddClient}>
+        <Button onClick={handleAddClient} className="bg-blue-600 hover:bg-blue-700 text-white">
           <Plus className="mr-2 h-4 w-4" />
           Ajouter un client
         </Button>

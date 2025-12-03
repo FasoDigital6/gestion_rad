@@ -80,6 +80,10 @@ export function StatusFilter({
                     onChange(currentValue === value ? null : currentValue);
                     setOpen(false);
                   }}
+                  onClick={() => {
+                    onChange(option.value === value ? null : option.value);
+                    setOpen(false);
+                  }}
                 >
                   <Check
                     className={cn(

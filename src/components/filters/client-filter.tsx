@@ -75,6 +75,10 @@ export function ClientFilter({
                     }
                     setOpen(false);
                   }}
+                  onClick={() => {
+                    onChange(client.id === value ? null : client.id);
+                    setOpen(false);
+                  }}
                 >
                   <Check
                     className={cn(

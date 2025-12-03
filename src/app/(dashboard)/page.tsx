@@ -102,19 +102,19 @@ export default function DashboardPage() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuItem onClick={() => router.push("/clients/new")}>
+            <DropdownMenuItem onClick={() => router.push("/clients")}>
               Nouveau client
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => router.push("/proformas/new")}>
+            <DropdownMenuItem onClick={() => router.push("/proformas")}>
               Nouvelle proforma
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => router.push("/bdc/new")}>
+            <DropdownMenuItem onClick={() => router.push("/bdc")}>
               Nouveau bon de commande
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => router.push("/bdl/new")}>
+            <DropdownMenuItem onClick={() => router.push("/bdl")}>
               Nouveau bon de livraison
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => router.push("/factures/new")}>
+            <DropdownMenuItem onClick={() => router.push("/factures")}>
               Nouvelle facture
             </DropdownMenuItem>
           </DropdownMenuContent>
