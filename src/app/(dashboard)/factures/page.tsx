@@ -186,35 +186,6 @@ export default function FacturesPage() {
         </Card>
       </div>
 
-      {/* Filtres */}
-      <Card className="mb-6">
-        <CardContent className="p-6">
-          <DataTableFilters
-            onClearAll={clearAllFilters}
-            hasActiveFilters={hasActiveFilters}
-            activeFiltersCount={activeFiltersCount}
-          >
-            <ClientFilter
-              clients={clients || []}
-              value={filters.client || null}
-              onChange={(value) => setFilter("client", value)}
-              placeholder="Tous les clients"
-            />
-            <StatusFilter
-              options={FACTURE_STATUS_OPTIONS}
-              value={filters.status || null}
-              onChange={(value) => setFilter("status", value)}
-              placeholder="Tous les statuts"
-            />
-            <PeriodFilter
-              value={filters.period || null}
-              onChange={(value) => setFilter("period", value)}
-              placeholder="Toutes les périodes"
-            />
-          </DataTableFilters>
-        </CardContent>
-      </Card>
-
       {/* Liste des factures */}
       <Card>
         <CardContent className="pt-6">
@@ -248,7 +219,32 @@ export default function FacturesPage() {
               })}
               data={filteredFactures}
               filterColumn="numero"
-              filterPlaceholder="Filtrer par numéro..."
+              filterPlaceholder="Rechercher par numéro..."
+              filters={
+                <DataTableFilters
+                  onClearAll={clearAllFilters}
+                  hasActiveFilters={hasActiveFilters}
+                  activeFiltersCount={activeFiltersCount}
+                >
+                  <ClientFilter
+                    clients={clients || []}
+                    value={filters.client || null}
+                    onChange={(value) => setFilter("client", value)}
+                    placeholder="Tous les clients"
+                  />
+                  <StatusFilter
+                    options={FACTURE_STATUS_OPTIONS}
+                    value={filters.status || null}
+                    onChange={(value) => setFilter("status", value)}
+                    placeholder="Tous les statuts"
+                  />
+                  <PeriodFilter
+                    value={filters.period || null}
+                    onChange={(value) => setFilter("period", value)}
+                    placeholder="Toutes les périodes"
+                  />
+                </DataTableFilters>
+              }
             />
           )}
         </CardContent>

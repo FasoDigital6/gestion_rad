@@ -53,7 +53,7 @@ export function ClientFilter({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
+      <PopoverContent className="w-[200px] p-0" align="start">
         <Command>
           <CommandInput placeholder="Rechercher un client..." />
           <CommandList>
@@ -63,18 +63,26 @@ export function ClientFilter({
                 <CommandItem
                   key={client.id}
                   value={client.nom}
-                  onSelect={() => {
-                    onChange(client.id === value ? null : client.id);
+                  className="cursor-pointer"
+                  onSelect={(currentValue) => {
+                    const selectedClient = clients.find(
+                      (c) => c.nom.toLowerCase() === currentValue.toLowerCase()
+                    );
+                    if (selectedClient) {
+                      onChange(
+                        selectedClient.id === value ? null : selectedClient.id
+                      );
+                    }
                     setOpen(false);
                   }}
                 >
                   <Check
                     className={cn(
-                      "mr-2 h-4 w-4",
+                      "mr-2 h-4 w-4 pointer-events-none",
                       value === client.id ? "opacity-100" : "opacity-0"
                     )}
                   />
-                  {client.nom}
+                  <span className="pointer-events-none">{client.nom}</span>
                 </CommandItem>
               ))}
             </CommandGroup>

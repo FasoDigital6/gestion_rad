@@ -1,32 +1,42 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, Filter, FileText, Send, CheckCircle, Download, Mail, Edit } from "lucide-react";
+import { Plus, FileText, Send, CheckCircle } from "lucide-react";
 import { useProformas } from "@/lib/hooks/use-proformas";
 import { useClients } from "@/lib/hooks/use-clients";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { format } from "date-fns";
-import { fr } from "date-fns/locale";
 import { pdf } from "@react-pdf/renderer";
 import { ProformaPDFTemplate } from "@/components/proformas/proforma-pdf-template";
 import { ProformaFormSheet } from "@/components/proformas/proforma-form-sheet";
-import { Proforma } from "@/lib/types/proforma";
+import { Proforma, ProformaStatut } from "@/lib/types/proforma";
 import { DataTable } from "@/components/data-table/data-table";
 import { createColumns } from "./columns-wrapper";
+import { useDataFilters } from "@/lib/hooks/use-data-filters";
+import {
+  DataTableFilters,
+  ClientFilter,
+  StatusFilter,
+  PeriodFilter,
+} from "@/components/filters";
+import { PROFORMA_STATUS_OPTIONS } from "@/lib/constants/status-options";
 
 export default function ProformasPage() {
   const router = useRouter();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState<"all" | "BROUILLON" | "ENVOYE" | "VALIDE">("all");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedProforma, setSelectedProforma] = useState<Proforma | null>(null);
 
   const { data: proformas, isLoading, error } = useProformas();
   const { data: clients } = useClients();
+
+  const {
+    filters,
+    setFilter,
+    clearAllFilters,
+    hasActiveFilters,
+    activeFiltersCount,
+  } = useDataFilters();
 
   const handleAddProforma = () => {
     setSelectedProforma(null);
@@ -103,6 +113,41 @@ Réseau Africain de Développement (RAD)`;
     }
   };
 
+  // Filtrer les proformas
+  const filteredProformas = useMemo(() => {
+    return proformas?.filter((proforma) => {
+      // Filtre par client
+      if (filters.client && proforma.clientId !== filters.client) {
+        return false;
+      }
+
+      // Filtre par statut
+      if (filters.status) {
+        const statusMap: Record<string, ProformaStatut> = {
+          brouillon: "BROUILLON",
+          envoye: "ENVOYE",
+          valide: "VALIDE",
+        };
+        if (proforma.statut !== statusMap[filters.status]) {
+          return false;
+        }
+      }
+
+      // Filtre par période
+      if (filters.period && proforma.dateCreation) {
+        const proformaDate = new Date(proforma.dateCreation);
+        if (filters.period.startDate && proformaDate < filters.period.startDate) {
+          return false;
+        }
+        if (filters.period.endDate && proformaDate > filters.period.endDate) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [proformas, filters]);
+
   // Statistiques
   const stats = {
     brouillons: proformas?.filter((p) => p.statut === "BROUILLON").length || 0,
@@ -110,39 +155,27 @@ Réseau Africain de Développement (RAD)`;
     valides: proformas?.filter((p) => p.statut === "VALIDE").length || 0,
   };
 
-  // Filtrage
-  const filteredProformas = proformas?.filter((proforma) => {
-    const matchesSearch =
-      proforma.numero.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      proforma.clientNom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (proforma.numeroDA || "").toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesFilter = filterStatus === "all" || proforma.statut === filterStatus;
-
-    return matchesSearch && matchesFilter;
-  });
-
   return (
     <div className="flex flex-col gap-6 p-6 lg:p-8">
       {/* Header */}
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">
-          Gestion des proformas
-        </h1>
-        <p className="text-base text-muted-foreground">
-          Créez et gérez vos devis et proformas
-        </p>
+      <div className="flex justify-between items-start">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">
+            Gestion des proformas
+          </h1>
+          <p className="text-base text-muted-foreground">
+            Créez et gérez vos devis et proformas
+          </p>
+        </div>
+        <Button onClick={handleAddProforma} className="gap-2 bg-brand text-brand-foreground hover:bg-brand/90">
+          <Plus className="h-4 w-4" />
+          Nouveau proforma
+        </Button>
       </div>
 
       {/* Stats Cards */}
       <div className="grid gap-6 md:grid-cols-3">
-        <Card
-          className={`border cursor-pointer transition-all ${filterStatus === "BROUILLON"
-            ? "border-ring shadow-md"
-            : "border-border hover:border-ring/50"
-            }`}
-          onClick={() => setFilterStatus(filterStatus === "BROUILLON" ? "all" : "BROUILLON")}
-        >
+        <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -156,13 +189,7 @@ Réseau Africain de Développement (RAD)`;
           </CardContent>
         </Card>
 
-        <Card
-          className={`border cursor-pointer transition-all ${filterStatus === "ENVOYE"
-            ? "border-brand/80 shadow-md"
-            : "border-border hover:border-ring/50"
-            }`}
-          onClick={() => setFilterStatus(filterStatus === "ENVOYE" ? "all" : "ENVOYE")}
-        >
+        <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -176,13 +203,7 @@ Réseau Africain de Développement (RAD)`;
           </CardContent>
         </Card>
 
-        <Card
-          className={`border cursor-pointer transition-all ${filterStatus === "VALIDE"
-            ? "border-success/80 shadow-md"
-            : "border-border hover:border-ring/50"
-            }`}
-          onClick={() => setFilterStatus(filterStatus === "VALIDE" ? "all" : "VALIDE")}
-        >
+        <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -197,41 +218,18 @@ Réseau Africain de Développement (RAD)`;
         </Card>
       </div>
 
-      {/* Search and Filter Bar */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="text"
-            placeholder="Rechercher un proforma..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-
-        <div className="flex items-center gap-3">
-          <Button variant="outline" className="gap-2">
-            <Filter className="h-4 w-4" />
-            Tous les statuts
-          </Button>
-          <Button onClick={handleAddProforma} className="gap-2 bg-brand text-brand-foreground hover:bg-brand/90">
-            <Plus className="h-4 w-4" />
-            Nouveau proforma
-          </Button>
-        </div>
-      </div>
-
       {/* Liste des proformas */}
       <Card className="border-border">
         <CardContent className="p-0">
           <div className="px-6 py-4 border-b border-border">
-            <h2 className="text-lg font-semibold text-foreground">
-              Liste des proformas
-            </h2>
-            <p className="text-sm text-muted-foreground mt-1">
-              {filteredProformas?.length || 0} proforma(s) au total
-            </p>
+            <div>
+              <h2 className="text-lg font-semibold text-foreground">
+                Liste des proformas
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                {filteredProformas?.length || 0} proforma(s) au total
+              </p>
+            </div>
           </div>
 
           {isLoading ? (
@@ -250,7 +248,32 @@ Réseau Africain de Développement (RAD)`;
               })}
               data={filteredProformas || []}
               filterColumn="numero"
-              filterPlaceholder="Filtrer par numéro..."
+              filterPlaceholder="Rechercher par numéro..."
+              filters={
+                <DataTableFilters
+                  onClearAll={clearAllFilters}
+                  hasActiveFilters={hasActiveFilters}
+                  activeFiltersCount={activeFiltersCount}
+                >
+                  <ClientFilter
+                    clients={clients || []}
+                    value={filters.client || null}
+                    onChange={(value) => setFilter("client", value)}
+                    placeholder="Tous les clients"
+                  />
+                  <StatusFilter
+                    options={PROFORMA_STATUS_OPTIONS}
+                    value={filters.status || null}
+                    onChange={(value) => setFilter("status", value)}
+                    placeholder="Tous les statuts"
+                  />
+                  <PeriodFilter
+                    value={filters.period || null}
+                    onChange={(value) => setFilter("period", value)}
+                    placeholder="Toutes les périodes"
+                  />
+                </DataTableFilters>
+              }
             />
           )}
         </CardContent>

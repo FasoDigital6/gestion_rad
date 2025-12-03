@@ -43,6 +43,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   filterColumn?: string;
   filterPlaceholder?: string;
+  filters?: React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({
@@ -50,6 +51,7 @@ export function DataTable<TData, TValue>({
   data,
   filterColumn,
   filterPlaceholder = "Rechercher...",
+  filters,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -85,7 +87,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-4 gap-2">
+      <div className="flex items-center py-4 gap-2 flex-wrap">
         {filterColumn && (
           <Input
             placeholder={filterPlaceholder}
@@ -98,6 +100,7 @@ export function DataTable<TData, TValue>({
             className="max-w-sm"
           />
         )}
+        {filters}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">

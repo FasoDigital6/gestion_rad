@@ -5,6 +5,7 @@ import { Truck } from "lucide-react";
 import { useBdls } from "@/lib/hooks/use-bdl";
 import { useClients } from "@/lib/hooks/use-clients";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { BdlStatut } from "@/lib/types/bdl";
 import { BdlSelectionTable } from "@/components/bdl/bdl-selection-table";
 import { FactureFormSheet } from "@/components/facture/facture-form-sheet";
@@ -20,6 +21,7 @@ import { BDL_STATUS_OPTIONS } from "@/lib/constants/status-options";
 export default function BdlPage() {
   const [selectedBdlIds, setSelectedBdlIds] = useState<string[]>([]);
   const [isFactureFormOpen, setIsFactureFormOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const { data: bdls, isLoading, error } = useBdls();
   const { data: clients } = useClients();
@@ -35,6 +37,14 @@ export default function BdlPage() {
   // Filtrer les BDLs
   const filteredBdls = useMemo(() => {
     return bdls?.filter((bdl) => {
+      // Filtre par recherche
+      if (searchTerm) {
+        const matchesSearch =
+          bdl.numero.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          bdl.clientNom.toLowerCase().includes(searchTerm.toLowerCase());
+        if (!matchesSearch) return false;
+      }
+
       // Filtre par client
       if (filters.client && bdl.clientId !== filters.client) {
         return false;
@@ -66,7 +76,7 @@ export default function BdlPage() {
 
       return true;
     });
-  }, [bdls, filters]);
+  }, [bdls, filters, searchTerm]);
 
   // Calculer les stats
   const stats = {
@@ -93,14 +103,7 @@ export default function BdlPage() {
 
       {/* Stats Cards */}
       <div className="grid gap-6 md:grid-cols-4 mb-8">
-        <Card
-          className={`cursor-pointer transition-all ${
-            filterStatus === "BROUILLON" ? "ring-2 ring-brand" : ""
-          }`}
-          onClick={() =>
-            setFilterStatus(filterStatus === "BROUILLON" ? "all" : "BROUILLON")
-          }
-        >
+        <Card>
           <CardContent className="p-6">
             <p className="text-sm font-medium text-gray-600">Brouillons</p>
             <p className="text-3xl font-bold text-gray-900 mt-2">
@@ -109,14 +112,7 @@ export default function BdlPage() {
           </CardContent>
         </Card>
 
-        <Card
-          className={`cursor-pointer transition-all ${
-            filterStatus === "EN_ROUTE" ? "ring-2 ring-brand" : ""
-          }`}
-          onClick={() =>
-            setFilterStatus(filterStatus === "EN_ROUTE" ? "all" : "EN_ROUTE")
-          }
-        >
+        <Card>
           <CardContent className="p-6">
             <p className="text-sm font-medium text-gray-600">En route</p>
             <p className="text-3xl font-bold text-brand mt-2">
@@ -125,14 +121,7 @@ export default function BdlPage() {
           </CardContent>
         </Card>
 
-        <Card
-          className={`cursor-pointer transition-all ${
-            filterStatus === "LIVRE" ? "ring-2 ring-success" : ""
-          }`}
-          onClick={() =>
-            setFilterStatus(filterStatus === "LIVRE" ? "all" : "LIVRE")
-          }
-        >
+        <Card>
           <CardContent className="p-6">
             <p className="text-sm font-medium text-gray-600">Livrés</p>
             <p className="text-3xl font-bold text-success mt-2">
@@ -141,14 +130,7 @@ export default function BdlPage() {
           </CardContent>
         </Card>
 
-        <Card
-          className={`cursor-pointer transition-all ${
-            filterStatus === "ANNULE" ? "ring-2 ring-destructive" : ""
-          }`}
-          onClick={() =>
-            setFilterStatus(filterStatus === "ANNULE" ? "all" : "ANNULE")
-          }
-        >
+        <Card>
           <CardContent className="p-6">
             <p className="text-sm font-medium text-gray-600">Annulés</p>
             <p className="text-3xl font-bold text-destructive mt-2">
@@ -158,38 +140,42 @@ export default function BdlPage() {
         </Card>
       </div>
 
-      {/* Filtres */}
-      <Card className="mb-6">
-        <CardContent className="p-6">
-          <DataTableFilters
-            onClearAll={clearAllFilters}
-            hasActiveFilters={hasActiveFilters}
-            activeFiltersCount={activeFiltersCount}
-          >
-            <ClientFilter
-              clients={clients || []}
-              value={filters.client || null}
-              onChange={(value) => setFilter("client", value)}
-              placeholder="Tous les clients"
-            />
-            <StatusFilter
-              options={BDL_STATUS_OPTIONS}
-              value={filters.status || null}
-              onChange={(value) => setFilter("status", value)}
-              placeholder="Tous les statuts"
-            />
-            <PeriodFilter
-              value={filters.period || null}
-              onChange={(value) => setFilter("period", value)}
-              placeholder="Toutes les périodes"
-            />
-          </DataTableFilters>
-        </CardContent>
-      </Card>
-
       {/* BDL Table avec sélection */}
       <Card>
         <CardContent className="p-0">
+          {/* Barre de recherche et filtres */}
+          <div className="flex items-center py-4 px-6 gap-2 flex-wrap border-b">
+            <Input
+              placeholder="Rechercher par numéro ou client..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="max-w-sm"
+            />
+            <DataTableFilters
+              onClearAll={clearAllFilters}
+              hasActiveFilters={hasActiveFilters}
+              activeFiltersCount={activeFiltersCount}
+            >
+              <ClientFilter
+                clients={clients || []}
+                value={filters.client || null}
+                onChange={(value) => setFilter("client", value)}
+                placeholder="Tous les clients"
+              />
+              <StatusFilter
+                options={BDL_STATUS_OPTIONS}
+                value={filters.status || null}
+                onChange={(value) => setFilter("status", value)}
+                placeholder="Tous les statuts"
+              />
+              <PeriodFilter
+                value={filters.period || null}
+                onChange={(value) => setFilter("period", value)}
+                placeholder="Toutes les périodes"
+              />
+            </DataTableFilters>
+          </div>
+
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <p>Chargement...</p>

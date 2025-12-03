@@ -152,35 +152,6 @@ export default function BdcPage() {
         </Card>
       </div>
 
-      {/* Filtres */}
-      <Card className="mb-6">
-        <CardContent className="p-6">
-          <DataTableFilters
-            onClearAll={clearAllFilters}
-            hasActiveFilters={hasActiveFilters}
-            activeFiltersCount={activeFiltersCount}
-          >
-            <ClientFilter
-              clients={clients || []}
-              value={filters.client || null}
-              onChange={(value) => setFilter("client", value)}
-              placeholder="Tous les clients"
-            />
-            <StatusFilter
-              options={BDC_STATUS_OPTIONS}
-              value={filters.status || null}
-              onChange={(value) => setFilter("status", value)}
-              placeholder="Tous les statuts"
-            />
-            <PeriodFilter
-              value={filters.period || null}
-              onChange={(value) => setFilter("period", value)}
-              placeholder="Toutes les périodes"
-            />
-          </DataTableFilters>
-        </CardContent>
-      </Card>
-
       {/* Liste des BDCs */}
       <Card>
         <CardContent className="p-0">
@@ -191,7 +162,32 @@ export default function BdcPage() {
               })}
               data={filteredBdcs}
               filterColumn="numero"
-              filterPlaceholder="Filtrer par numéro..."
+              filterPlaceholder="Rechercher par numéro..."
+              filters={
+                <DataTableFilters
+                  onClearAll={clearAllFilters}
+                  hasActiveFilters={hasActiveFilters}
+                  activeFiltersCount={activeFiltersCount}
+                >
+                  <ClientFilter
+                    clients={clients || []}
+                    value={filters.client || null}
+                    onChange={(value) => setFilter("client", value)}
+                    placeholder="Tous les clients"
+                  />
+                  <StatusFilter
+                    options={BDC_STATUS_OPTIONS}
+                    value={filters.status || null}
+                    onChange={(value) => setFilter("status", value)}
+                    placeholder="Tous les statuts"
+                  />
+                  <PeriodFilter
+                    value={filters.period || null}
+                    onChange={(value) => setFilter("period", value)}
+                    placeholder="Toutes les périodes"
+                  />
+                </DataTableFilters>
+              }
             />
           ) : (
             <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">

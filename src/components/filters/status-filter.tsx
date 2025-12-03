@@ -66,7 +66,7 @@ export function StatusFilter({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
+      <PopoverContent className="w-[200px] p-0" align="start">
         <Command>
           <CommandList>
             <CommandEmpty>Aucun statut trouvé.</CommandEmpty>
@@ -75,24 +75,25 @@ export function StatusFilter({
                 <CommandItem
                   key={option.value}
                   value={option.value}
-                  onSelect={() => {
-                    onChange(option.value === value ? null : option.value);
+                  className="cursor-pointer"
+                  onSelect={(currentValue) => {
+                    onChange(currentValue === value ? null : currentValue);
                     setOpen(false);
                   }}
                 >
                   <Check
                     className={cn(
-                      "mr-2 h-4 w-4",
+                      "mr-2 h-4 w-4 pointer-events-none",
                       value === option.value ? "opacity-100" : "opacity-0"
                     )}
                   />
                   <span
                     className={cn(
-                      "mr-2 h-2 w-2 rounded-full",
+                      "mr-2 h-2 w-2 rounded-full pointer-events-none",
                       option.color || "bg-gray-500"
                     )}
                   />
-                  {option.label}
+                  <span className="pointer-events-none">{option.label}</span>
                 </CommandItem>
               ))}
             </CommandGroup>

@@ -118,11 +118,19 @@ export function PeriodFilter({
         <DropdownMenuSeparator />
         <Popover open={showCustom} onOpenChange={setShowCustom}>
           <PopoverTrigger asChild>
-            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <DropdownMenuItem
+              onSelect={(e) => {
+                e.preventDefault();
+                setShowCustom(true);
+              }}
+            >
               Personnalisé...
             </DropdownMenuItem>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
+          <PopoverContent
+            className="w-auto p-0"
+            align="start"
+          >
             <CalendarComponent
               mode="range"
               selected={{
