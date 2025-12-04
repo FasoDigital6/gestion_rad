@@ -9,16 +9,30 @@ import configuration from '@/configurations';
 const projectId = configuration.firebase.projectId;
 const storageBucket = configuration.firebase.storageBucket;
 
-if (!getApps().length) {
-    initializeApp({
-        credential: cert({
-            clientEmail: process.env.SERVICE_ACCOUNT_CLIENT_EMAIL,
-            privateKey: process.env.SERVICE_ACCOUNT_PRIVATE_KEY?.replace(/\\n/g, '\n') || '',
-            projectId,
-        }),
-        storageBucket,
-    });
+function initializeFirebaseAdmin() {
+    if (!getApps().length) {
+        // Only initialize if we have the required environment variables
+        const privateKey = process.env.SERVICE_ACCOUNT_PRIVATE_KEY;
+        const clientEmail = process.env.SERVICE_ACCOUNT_CLIENT_EMAIL;
+
+        if (!privateKey || !clientEmail) {
+            // During build time, these won't be available, so skip initialization
+            return;
+        }
+
+        initializeApp({
+            credential: cert({
+                clientEmail,
+                privateKey: privateKey.replace(/\\n/g, '\n'),
+                projectId,
+            }),
+            storageBucket,
+        });
+    }
 }
+
+// Initialize Firebase Admin
+initializeFirebaseAdmin();
 
 const dbAdmin = getFirestore();
 const authAdmin = getAuth()

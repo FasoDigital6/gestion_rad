@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { authAdmin, dbAdmin } from "@/lib/firebase/server/config";
 import { USERS_COLLECTION_NAME } from "@/lib/firebase/collections_name";
 
+export const dynamic = 'force-dynamic';
+
 /**
  * API de développement pour synchroniser l'utilisateur admin dans Firestore
  * Utilise l'email mabiri@radguinee.com
