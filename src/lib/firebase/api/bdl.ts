@@ -639,7 +639,7 @@ export async function updateBdl(bdlData: UpdateBdlInput): Promise<void> {
     } else if (updateData.remisePourcentage !== undefined) {
       // Si seulement la remise change, recalculer les totaux
       const lignes = currentBdl.data().lignes || [];
-      const { total, remiseMontant, totalNet } = calculateTotals(
+      const { remiseMontant, totalNet } = calculateTotals(
         lignes,
         updateData.remisePourcentage
       );

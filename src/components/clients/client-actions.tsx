@@ -22,7 +22,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Client } from "@/lib/types/client";
-import { useToggleClientStatus, useDeleteClient } from "@/lib/hooks/use-clients";
+import { useDeleteClient } from "@/lib/hooks/use-clients";
 import { useRouter } from "next/navigation";
 
 interface ClientActionsProps {
@@ -33,16 +33,7 @@ interface ClientActionsProps {
 export function ClientActions({ client, onEdit }: ClientActionsProps) {
   const router = useRouter();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const toggleStatusMutation = useToggleClientStatus();
   const deleteMutation = useDeleteClient();
-
-  const handleToggleStatus = async () => {
-    const newStatus = client.statut === "actif" ? "inactif" : "actif";
-    await toggleStatusMutation.mutateAsync({
-      id: client.id,
-      statut: newStatus,
-    });
-  };
 
   const handleViewDetails = () => {
     router.push(`/clients/${client.id}`);
@@ -81,16 +72,6 @@ export function ClientActions({ client, onEdit }: ClientActionsProps) {
             Modifier
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onClick={handleToggleStatus}
-            disabled={toggleStatusMutation.isPending}
-          >
-            {toggleStatusMutation.isPending
-              ? "Chargement..."
-              : client.statut === "actif"
-              ? "Désactiver"
-              : "Activer"}
-          </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => setIsDeleteDialogOpen(true)}
             className="text-red-600"

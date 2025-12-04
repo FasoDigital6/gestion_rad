@@ -89,7 +89,7 @@ export default function FinancesPage() {
         <div>
           <h1 className="text-2xl font-bold">Finances</h1>
           <p className="text-sm text-muted-foreground">
-            Vue d'ensemble de la situation financière
+            Vue d&apos;ensemble de la situation financière
           </p>
         </div>
         <Button
@@ -192,7 +192,7 @@ export default function FinancesPage() {
         {/* Placeholder pour graphiques futurs */}
         <div className="bg-muted/20 rounded-lg border-2 border-dashed border-muted-foreground/25 p-8 flex items-center justify-center">
           <p className="text-sm text-muted-foreground text-center">
-            Graphique d'évolution
+            Graphique d&apos;évolution
             <br />
             <span className="text-xs">(à venir)</span>
           </p>

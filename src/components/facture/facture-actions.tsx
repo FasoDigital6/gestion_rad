@@ -45,8 +45,9 @@ export function FactureActions({ facture }: FactureActionsProps) {
       });
       setShowEmettreDialog(false);
       router.refresh();
-    } catch (error: any) {
-      alert("Erreur lors de l'émission de la facture: " + error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Une erreur inconnue";
+      alert("Erreur lors de l'émission de la facture: " + errorMessage);
     }
   };
 
@@ -65,8 +66,9 @@ export function FactureActions({ facture }: FactureActionsProps) {
       });
       setShowAnnulerDialog(false);
       router.refresh();
-    } catch (error: any) {
-      alert("Erreur lors de l'annulation de la facture: " + error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Une erreur inconnue";
+      alert("Erreur lors de l'annulation de la facture: " + errorMessage);
     }
   };
 
@@ -115,7 +117,7 @@ export function FactureActions({ facture }: FactureActionsProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Émettre la facture</AlertDialogTitle>
             <AlertDialogDescription>
-              Vous êtes sur le point d'émettre la facture {facture.numero}.
+              Vous êtes sur le point d&apos;émettre la facture {facture.numero}.
               <br />
               <br />
               <strong className="text-yellow-600">
@@ -152,7 +154,7 @@ export function FactureActions({ facture }: FactureActionsProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Annuler la facture</AlertDialogTitle>
             <AlertDialogDescription>
-              Vous êtes sur le point d'annuler la facture {facture.numero}.
+              Vous êtes sur le point d&apos;annuler la facture {facture.numero}.
               <br />
               <br />
               {facture.bdlIds && facture.bdlIds.length > 0 && (
@@ -173,13 +175,13 @@ export function FactureActions({ facture }: FactureActionsProps) {
                 </span>
               )}
               Cette action est irréversible. Veuillez indiquer le motif de
-              l'annulation.
+              l&apos;annulation.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
           <div className="space-y-2 py-4">
             <Label htmlFor="motif">
-              Motif d'annulation <span className="text-red-500">*</span>
+              Motif d&apos;annulation <span className="text-red-500">*</span>
             </Label>
             <Textarea
               id="motif"
@@ -202,7 +204,7 @@ export function FactureActions({ facture }: FactureActionsProps) {
               {updateStatut.isPending && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
-              Confirmer l'annulation
+              Confirmer l&apos;annulation
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

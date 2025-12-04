@@ -1,6 +1,6 @@
 import type { Proforma } from "../types/proforma";
-import type { BonCommande } from "../types/bdc";
-import type { BonLivraison } from "../types/bdl";
+import type { Bdc } from "../types/bdc";
+import type { Bdl } from "../types/bdl";
 import type { Facture } from "../types/facture";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -69,8 +69,8 @@ export function calculateConversionRates({
   factures,
 }: {
   proformas: Proforma[];
-  bdcs: BonCommande[];
-  bdls: BonLivraison[];
+  bdcs: Bdc[];
+  bdls: Bdl[];
   factures: Facture[];
 }): ConversionRates {
   const proformasValides = proformas.filter((p) => p.statut === "VALIDE").length;
@@ -116,9 +116,9 @@ export function generateActionItems({
   bdls,
 }: {
   factures: Facture[];
-  bdcs: BonCommande[];
+  bdcs: Bdc[];
   proformas: Proforma[];
-  bdls: BonLivraison[];
+  bdls: Bdl[];
 }): ActionItem[] {
   const today = new Date();
   const actions: ActionItem[] = [];

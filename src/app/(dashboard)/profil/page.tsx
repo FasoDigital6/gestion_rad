@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,7 +26,6 @@ export default function ProfilPage() {
   const updateUserMutation = useUpdateUser();
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   // États pour le profil
   const [telephone, setTelephone] = useState("");
@@ -45,7 +44,6 @@ export default function ProfilPage() {
   }, [user, authUser]);
 
   // États pour le mot de passe
-  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -90,8 +88,9 @@ export default function ProfilPage() {
 
       setProfileMessage({ type: "success", text: "Profil mis à jour avec succès !" });
       setIsEditingProfile(false);
-    } catch (error: any) {
-      setProfileMessage({ type: "error", text: error.message || "Erreur lors de la mise à jour du profil" });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Erreur lors de la mise à jour du profil";
+      setProfileMessage({ type: "error", text: message });
     }
   };
 
@@ -120,18 +119,17 @@ export default function ProfilPage() {
       await updatePassword(auth_client.currentUser, newPassword);
 
       setPasswordMessage({ type: "success", text: "Mot de passe modifié avec succès !" });
-      setIsChangingPassword(false);
-      setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-    } catch (error: any) {
-      if (error.code === "auth/requires-recent-login") {
+    } catch (error) {
+      if (error && typeof error === 'object' && 'code' in error && error.code === "auth/requires-recent-login") {
         setPasswordMessage({
           type: "error",
           text: "Pour des raisons de sécurité, veuillez vous reconnecter avant de changer votre mot de passe"
         });
       } else {
-        setPasswordMessage({ type: "error", text: error.message || "Erreur lors du changement de mot de passe" });
+        const message = error instanceof Error ? error.message : "Erreur lors du changement de mot de passe";
+        setPasswordMessage({ type: "error", text: message });
       }
     }
   };
@@ -307,7 +305,7 @@ export default function ProfilPage() {
                   className="h-11 bg-gray-50"
                 />
                 <p className="text-xs text-gray-500">
-                  Le rôle est défini par l'administrateur
+                  Le rôle est défini par l&apos;administrateur
                 </p>
               </div>
             </CardContent>
@@ -374,7 +372,7 @@ export default function ProfilPage() {
                 <ul className="text-sm text-blue-700 mt-2 space-y-1 list-disc list-inside">
                   <li>Utilisez au moins 6 caractères</li>
                   <li>Combinez lettres, chiffres et symboles</li>
-                  <li>Ne réutilisez pas d'anciens mots de passe</li>
+                  <li>Ne réutilisez pas d&apos;anciens mots de passe</li>
                   <li>Changez régulièrement votre mot de passe</li>
                 </ul>
               </div>

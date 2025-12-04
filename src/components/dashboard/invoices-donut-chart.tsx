@@ -28,14 +28,15 @@ export function InvoicesDonutChart({ data }: InvoicesDonutChartProps) {
       color: STATUT_CONFIG[statut]?.color || "#9ca3af",
     }));
 
-  const renderCustomLabel = ({
-    cx,
-    cy,
-    midAngle,
-    innerRadius,
-    outerRadius,
-    percent,
-  }: any) => {
+  const renderCustomLabel = (props: unknown) => {
+    const {
+      cx,
+      cy,
+      midAngle,
+      innerRadius,
+      outerRadius,
+      percent,
+    } = props as Record<string, number>;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
     const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
@@ -74,7 +75,7 @@ export function InvoicesDonutChart({ data }: InvoicesDonutChartProps) {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={renderCustomLabel}
+                label={renderCustomLabel as unknown as boolean}
                 outerRadius={100}
                 innerRadius={60}
                 fill="#8884d8"
@@ -94,7 +95,10 @@ export function InvoicesDonutChart({ data }: InvoicesDonutChartProps) {
               <Legend
                 verticalAlign="bottom"
                 height={36}
-                formatter={(value, entry: any) => `${value} (${entry.payload.value})`}
+                formatter={(value, entry: unknown) => {
+                  const e = entry as Record<string, Record<string, unknown>>;
+                  return `${value} (${e.payload.value})`;
+                }}
               />
             </PieChart>
           </ResponsiveContainer>

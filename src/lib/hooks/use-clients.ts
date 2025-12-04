@@ -7,7 +7,6 @@ import {
   deleteClient,
   toggleClientStatus,
 } from "@/lib/firebase/api/clients";
-import { CreateClientInput, UpdateClientInput } from "@/lib/types/client";
 
 /**
  * Hook pour récupérer la liste de tous les clients

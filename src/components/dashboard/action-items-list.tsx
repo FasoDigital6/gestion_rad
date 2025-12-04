@@ -24,7 +24,7 @@ export function ActionItemsList({ actions }: ActionItemsListProps) {
             </div>
             <h3 className="font-semibold text-lg mb-1">Tout est à jour !</h3>
             <p className="text-sm text-muted-foreground max-w-sm">
-              Aucune action urgente n'est requise pour le moment. Continuez votre excellent travail !
+              Aucune action urgente n&apos;est requise pour le moment. Continuez votre excellent travail !
             </p>
           </div>
         </CardContent>

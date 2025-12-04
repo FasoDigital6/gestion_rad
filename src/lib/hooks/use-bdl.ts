@@ -172,7 +172,7 @@ export function useDeleteBdl() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, bdcId }: { id: string; bdcId: string }) => deleteBdl(id),
+    mutationFn: ({ id }: { id: string; bdcId: string }) => deleteBdl(id),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["bdls"] });
       queryClient.invalidateQueries({

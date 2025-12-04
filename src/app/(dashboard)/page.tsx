@@ -25,7 +25,6 @@ import { useRouter } from "next/navigation";
 import { ClientFormSheet } from "@/components/clients/client-form-sheet";
 import { ProformaFormSheet } from "@/components/proformas/proforma-form-sheet";
 import { BdcFormSheet } from "@/components/bdc/bdc-form-sheet";
-import { BdlFormSheet } from "@/components/bdl/bdl-form-sheet";
 import { FactureFormSheet } from "@/components/facture/facture-form-sheet";
 
 export default function DashboardPage() {
@@ -45,7 +44,6 @@ export default function DashboardPage() {
   const [isClientFormOpen, setIsClientFormOpen] = useState(false);
   const [isProformaFormOpen, setIsProformaFormOpen] = useState(false);
   const [isBdcFormOpen, setIsBdcFormOpen] = useState(false);
-  const [isBdlFormOpen, setIsBdlFormOpen] = useState(false);
   const [isFactureFormOpen, setIsFactureFormOpen] = useState(false);
 
   if (isLoading) {
@@ -105,7 +103,7 @@ export default function DashboardPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-base text-muted-foreground mt-1">
-            Vue d'ensemble de votre activité commerciale
+            Vue d&apos;ensemble de votre activité commerciale
           </p>
         </div>
         <DropdownMenu>
@@ -124,9 +122,6 @@ export default function DashboardPage() {
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setIsBdcFormOpen(true)}>
               Nouveau bon de commande
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setIsBdlFormOpen(true)}>
-              Nouveau bon de livraison
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setIsFactureFormOpen(true)}>
               Nouvelle facture

@@ -6,15 +6,13 @@ import Select, {
   ClearIndicatorProps,
   MultiValueRemoveProps,
   MenuListProps,
-  SingleValue,
-  MultiValue,
 } from "react-select";
 
 // Type pour les options du select
 export interface Option {
   label: string;
   value: string | number;
-  [key: string]: any; // Pour des propriétés additionnelles
+  [key: string]: unknown; // Pour des propriétés additionnelles
 }
 
 // Type pour le field (compatible avec react-hook-form Controller)
@@ -29,9 +27,9 @@ export interface SimpleSelectProps {
   field: SelectField;
   placeholder?: string;
   options: Option[];
-  onChange?: (value: Option | Option[] | null) => void;
+  onChange?: (value: Option | readonly Option[] | null) => void;
   primaryColor?: string;
-  [key: string]: any; // Pour les props supplémentaires passées à react-select
+  [key: string]: unknown; // Pour les props supplémentaires passées à react-select
 }
 
 // Props pour SimpleSelectWithAddButton
@@ -39,7 +37,7 @@ export interface SimpleSelectWithAddButtonProps extends SimpleSelectProps {
   addButtonIcon?: React.ReactNode;
   addButtonLabel?: string;
   onAddButtonClick: () => void;
-  components?: any;
+  components?: Record<string, unknown>;
 }
 
 const DropdownIndicator = (props: DropdownIndicatorProps<Option, boolean>) => {

@@ -30,7 +30,7 @@ export async function loginAction(formData: z.infer<typeof loginSchema>) {
         await refreshCookiesWithIdToken(idToken, await headers(), await cookies(), authConfig);
 
         return { success: true };
-    } catch (e) {
+    } catch {
         return { error: "Email ou mot de passe incorrect." };
     }
 }

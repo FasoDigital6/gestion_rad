@@ -4,8 +4,6 @@ import {
   Text,
   View,
   StyleSheet,
-  Image,
-  Font,
 } from "@react-pdf/renderer";
 import { Proforma } from "@/lib/types/proforma";
 import { format } from "date-fns";
@@ -231,7 +229,7 @@ export function ProformaPDFTemplate({ proforma }: ProformaPDFTemplateProps) {
                 Réseau Africain de Développement
               </Text>
               <Text style={styles.companySubtitle}>
-                Exécution des Travaux d'Ingénierie, Commerce Général,
+                Exécution des Travaux d&apos;Ingénierie, Commerce Général,
                 Fourniture,{"\n"}Prestations de Services & Divers
               </Text>
             </View>

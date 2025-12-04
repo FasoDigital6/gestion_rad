@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Eye, Edit, Trash2, FileText, Download } from "lucide-react";
+import { MoreHorizontal, Eye, Edit, Trash2, Download } from "lucide-react";
 import { pdf } from "@react-pdf/renderer";
 import { ProformaPDFTemplate } from "@/components/proformas/proforma-pdf-template";
 import { useDeleteProforma } from "@/lib/hooks/use-proformas";
@@ -105,7 +105,7 @@ export function createColumns({
     },
     {
       id: "actions",
-      cell: ({ row }) => {
+      cell: function ActionsCell({ row }) {
         const proforma = row.original;
         const deleteMutation = useDeleteProforma();
 

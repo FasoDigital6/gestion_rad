@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { SheetFooter } from "@/components/ui/sheet";
 import { Slider } from "@/components/ui/slider";
 import { DatePicker } from "@/components/ui/date-picker";
-import SimpleSelect, {
+import  {
   Option,
   SimpleSelectWithAddButton,
 } from "@/components/react-select/simple-select";
@@ -20,20 +20,13 @@ import {
 import { useClients } from "@/lib/hooks/use-clients";
 import { Proforma } from "@/lib/types/proforma";
 import { Loader2, Plus, Trash2 } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+
 import { RiUserAddLine } from "react-icons/ri";
 import { ClientFormSheet } from "@/components/clients/client-form-sheet";
 import {
   Field,
   FieldLabel,
   FieldError,
-  FieldGroup,
 } from "@/components/ui/field";
 
 // Schéma de validation avec Zod
@@ -270,7 +263,7 @@ export function ProformaFormSheet({
                           htmlFor="date"
                           className="text-foreground font-medium"
                         >
-                          Date d'émission
+                          Date d&apos;émission
                         </FieldLabel>
                         <DatePicker
                           date={field.value}
@@ -300,7 +293,7 @@ export function ProformaFormSheet({
                           htmlFor="dateLivraison"
                           className="text-foreground font-medium"
                         >
-                          Validité de l'offre
+                          Validité de l&apos;offre
                         </FieldLabel>
                         <div className="relative">
                           <Input

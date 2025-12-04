@@ -1,11 +1,6 @@
-import { Inter } from "next/font/google";
 import { Metadata } from "next";
 
 import { GlobalNav } from "@/components/global/nav";
-
-
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {

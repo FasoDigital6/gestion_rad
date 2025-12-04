@@ -47,7 +47,7 @@ export default function FactureDetailsPage({
             Facture non trouvée
           </h2>
           <p className="text-gray-500 mb-4">
-            La facture demandée n'existe pas ou a été supprimée.
+            La facture demandée n&apos;existe pas ou a été supprimée.
           </p>
           <Button onClick={() => router.push("/factures")}>
             Retour aux factures
@@ -128,7 +128,7 @@ export default function FactureDetailsPage({
       {facture.statut === "ANNULEE" && facture.motifAnnulation && (
         <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-sm font-medium text-red-800">
-            Motif d'annulation:
+            Motif d&apos;annulation:
           </p>
           <p className="text-sm text-red-700 mt-1">{facture.motifAnnulation}</p>
         </div>

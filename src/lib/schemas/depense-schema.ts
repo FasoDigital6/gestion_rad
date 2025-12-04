@@ -26,8 +26,7 @@ const categorieDepenseSchema = z.enum([
 export const createDepenseSchema = z.object({
   montant: z
     .number({
-      required_error: "Le montant est requis",
-      invalid_type_error: "Le montant doit être un nombre",
+      message: "Le montant doit être un nombre",
     })
     .positive("Le montant doit être supérieur à 0"),
 
@@ -39,7 +38,7 @@ export const createDepenseSchema = z.object({
     .max(500, "La description ne peut pas dépasser 500 caractères"),
 
   dateDepense: z.date({
-    required_error: "La date de la dépense est requise",
+    message: "La date de la dépense est requise",
   }),
 
   bdcId: z.string().optional(),

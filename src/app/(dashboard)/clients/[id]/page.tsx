@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useClient } from "@/lib/hooks/use-clients";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Mail, Phone, MapPin, FileText, Edit } from "lucide-react";
+import { ArrowLeft, Edit } from "lucide-react";
 import { ClientInfoCard } from "@/components/clients/client-info-card";
 import { ClientFinancialStats } from "@/components/clients/client-financial-stats";
 import { ClientDocumentsTabs } from "@/components/clients/client-documents-tabs";

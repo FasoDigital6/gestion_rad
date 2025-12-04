@@ -1,7 +1,5 @@
 import {
   collection,
-  addDoc,
-  deleteDoc,
   doc,
   getDocs,
   getDoc,
@@ -23,7 +21,6 @@ import type {
   CreatePaiementInput,
   FacturePaiementsSummary,
 } from "@/lib/types/paiement";
-import type { FactureStatut } from "@/lib/types/facture";
 import { getFacture } from "./facture";
 import { calculateFactureStatut } from "@/lib/utils/facture";
 
@@ -210,7 +207,7 @@ export async function addPaiement(
       transaction.set(paiementRef, paiementData);
 
       // Mettre à jour la facture
-      const factureUpdateData: any = {
+      const factureUpdateData: Record<string, unknown> = {
         totalPaye: newTotalPaye,
         soldeRestant: newSoldeRestant,
         statut: newStatut,
@@ -280,7 +277,7 @@ export async function deletePaiement(id: string): Promise<void> {
       );
 
       // Mettre à jour la facture
-      const factureUpdateData: any = {
+      const factureUpdateData: Record<string, unknown> = {
         totalPaye: newTotalPaye,
         soldeRestant: newSoldeRestant,
         statut: newStatut,

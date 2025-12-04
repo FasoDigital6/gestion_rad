@@ -3,7 +3,6 @@ import { authMiddleware } from "next-firebase-auth-edge";
 import { authConfig } from "./lib/firebase/auth/config";
 import { filterStandardClaims } from "next-firebase-auth-edge/lib/auth/claims";
 
-const HOME_PATHS = ["/"];
 const AUTH_PATHS = ["/login", "/auth/logout"];
 
 const pathStartsWith = (pathname: string, prefixes: string[]) =>
@@ -37,7 +36,7 @@ export async function middleware(request: NextRequest) {
     cookieSignatureKeys: authConfig.cookieSignatureKeys,
     serviceAccount: authConfig.serviceAccount,
 
-    handleValidToken: async ({ token, decodedToken }, headers) => {
+    handleValidToken: async ({ decodedToken }, headers) => {
       // Gestion des Rôles via Custom Claims
       const claims = filterStandardClaims(decodedToken);
 

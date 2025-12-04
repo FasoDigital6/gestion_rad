@@ -13,7 +13,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Proforma, ProformaStatut } from "@/lib/types/proforma";
+import { Proforma } from "@/lib/types/proforma";
 import { useUpdateProformaStatut } from "@/lib/hooks/use-proformas";
 
 interface ProformaActionsProps {

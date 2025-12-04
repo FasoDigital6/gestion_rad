@@ -48,7 +48,7 @@ export default function ProformasPage() {
     setIsFormOpen(true);
   };
 
-  const handleDownloadPDF = async (proforma: any) => {
+  const handleDownloadPDF = async (proforma: Proforma) => {
     try {
       const blob = await pdf(<ProformaPDFTemplate proforma={proforma} />).toBlob();
       const url = URL.createObjectURL(blob);
@@ -62,7 +62,7 @@ export default function ProformasPage() {
     }
   };
 
-  const handleSendEmail = async (proforma: any) => {
+  const handleSendEmail = async (proforma: Proforma) => {
     try {
       // Trouver le client
       const client = clients?.find((c) => c.id === proforma.clientId);
@@ -74,8 +74,6 @@ export default function ProformasPage() {
       const reader = new FileReader();
       reader.readAsDataURL(blob);
       reader.onloadend = () => {
-        const base64data = reader.result as string;
-
         // Préparer le contenu de l'email
         const emailTo = client?.email || "";
         const emailSubject = `Proforma ${proforma.numero} - ${proforma.clientNom}`;

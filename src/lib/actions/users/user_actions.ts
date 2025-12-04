@@ -29,7 +29,13 @@ export async function createUserAction(formData: CreateUserInput) {
     const tempPassword = Math.random().toString(36).slice(-12) + "Aa1!";
 
     // Créer l'utilisateur dans Firebase Auth
-    const createUserData: any = {
+    const createUserData: {
+      email: string;
+      displayName: string;
+      password: string;
+      emailVerified: boolean;
+      phoneNumber?: string;
+    } = {
       email,
       displayName: `${prenom} ${nom}`,
       password: tempPassword,
@@ -96,7 +102,12 @@ export async function updateUserAction(userId: string, formData: UpdateUserInput
     const { email, nom, prenom, telephone, poste, adresse, role, disabled } = result.data;
 
     // Mettre à jour Firebase Auth
-    const updateAuthData: any = {};
+    const updateAuthData: {
+      displayName?: string;
+      email?: string;
+      phoneNumber?: string | null;
+      disabled?: boolean;
+    } = {};
     if (nom && prenom) {
       updateAuthData.displayName = `${prenom} ${nom}`;
     }
@@ -122,7 +133,17 @@ export async function updateUserAction(userId: string, formData: UpdateUserInput
     }
 
     // Mettre à jour Firestore
-    const updateFirestoreData: any = {
+    const updateFirestoreData: {
+      updatedAt: string;
+      email?: string;
+      nom?: string;
+      prenom?: string;
+      telephone?: string;
+      poste?: string;
+      adresse?: string;
+      role?: string;
+      disabled?: boolean;
+    } = {
       updatedAt: new Date().toISOString(),
     };
     if (email) updateFirestoreData.email = email;

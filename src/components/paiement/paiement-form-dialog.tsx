@@ -115,8 +115,9 @@ export function PaiementFormDialog({
 
       reset();
       onOpenChange(false);
-    } catch (error: any) {
-      alert("Erreur lors de l'ajout du paiement: " + error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Une erreur inconnue";
+      alert("Erreur lors de l'ajout du paiement: " + errorMessage);
     }
   };
 

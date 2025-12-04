@@ -6,8 +6,6 @@ import {
   updateUser,
   deleteUser,
   toggleUserStatus,
-  CreateUserInput,
-  UpdateUserInput,
 } from "@/lib/firebase/api/users";
 
 /**

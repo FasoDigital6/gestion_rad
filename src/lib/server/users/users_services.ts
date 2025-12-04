@@ -17,7 +17,6 @@ export const toUser = ({ token, customToken, decodedToken }: Tokens): User => {
         uid,
         email,
         picture: photoURL,
-        email_verified: emailVerified,
         phone_number: phoneNumber,
         name: displayName,
         source_sign_in_provider: signInProvider,

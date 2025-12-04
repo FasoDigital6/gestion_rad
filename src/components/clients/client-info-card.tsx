@@ -56,34 +56,7 @@ export function ClientInfoCard({ client }: ClientInfoCardProps) {
             <div className="rounded-lg bg-primary/10 p-2">
               <Building2 className="h-4 w-4 text-primary" />
             </div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-muted-foreground">Statut</p>
-              <div className="mt-1">
-                <span
-                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    client.statut === "actif"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-gray-100 text-gray-800"
-                  }`}
-                >
-                  {client.statut === "actif" ? "Actif" : "Inactif"}
-                </span>
-              </div>
-            </div>
           </div>
-
-          {/* IFU */}
-          {client.ifu && (
-            <div className="flex items-start gap-3">
-              <div className="rounded-lg bg-primary/10 p-2">
-                <FileText className="h-4 w-4 text-primary" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-muted-foreground">IFU</p>
-                <p className="text-sm">{client.ifu}</p>
-              </div>
-            </div>
-          )}
 
           {/* RCCM */}
           {client.rccm && (

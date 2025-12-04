@@ -13,7 +13,7 @@ export interface FilterValue {
 
 export interface UseDataFiltersResult {
   filters: FilterValue;
-  setFilter: (key: keyof FilterValue, value: any) => void;
+  setFilter: (key: keyof FilterValue, value: FilterValue[keyof FilterValue]) => void;
   clearFilter: (key: keyof FilterValue) => void;
   clearAllFilters: () => void;
   hasActiveFilters: boolean;
@@ -23,7 +23,7 @@ export interface UseDataFiltersResult {
 export function useDataFilters(initialFilters: FilterValue = {}): UseDataFiltersResult {
   const [filters, setFilters] = useState<FilterValue>(initialFilters);
 
-  const setFilter = (key: keyof FilterValue, value: any) => {
+  const setFilter = (key: keyof FilterValue, value: FilterValue[keyof FilterValue]) => {
     setFilters((prev) => ({
       ...prev,
       [key]: value,

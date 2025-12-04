@@ -217,7 +217,7 @@ export function FacturePDFTemplate({ facture }: FacturePDFTemplateProps) {
                 Réseau Africain de Développement
               </Text>
               <Text style={styles.companySubtitle}>
-                Exécution des Travaux d'Ingénierie, Commerce Général,
+                Exécution des Travaux d&apos;Ingénierie, Commerce Général,
                 Fourniture,{"\n"}Prestations de Services & Divers
               </Text>
             </View>
@@ -245,11 +245,11 @@ export function FacturePDFTemplate({ facture }: FacturePDFTemplateProps) {
         {/* Dates */}
         <View style={styles.datesSection}>
           <Text>
-            Date d'émission: {format(facture.dateEmission, "dd/MM/yyyy", { locale: fr })}
+            Date d&apos;émission: {format(facture.dateEmission, "dd/MM/yyyy", { locale: fr })}
           </Text>
           {facture.dateEcheance && (
             <Text>
-              Date d'échéance: {format(facture.dateEcheance, "dd/MM/yyyy", { locale: fr })}
+              Date d&apos;échéance: {format(facture.dateEcheance, "dd/MM/yyyy", { locale: fr })}
             </Text>
           )}
         </View>

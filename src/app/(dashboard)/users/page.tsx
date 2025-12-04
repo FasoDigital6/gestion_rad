@@ -64,9 +64,10 @@ export default function UsersPage() {
           ? "Utilisateur activé avec succès"
           : "Utilisateur désactivé avec succès"
       );
-    } catch (error: any) {
+    } catch (error) {
       console.error("Erreur lors du changement de statut:", error);
-      toast.error(error.message || "Erreur lors du changement de statut");
+      const message = error instanceof Error ? error.message : "Erreur lors du changement de statut";
+      toast.error(message);
     }
   };
 
@@ -77,9 +78,10 @@ export default function UsersPage() {
       await deleteUserMutation.mutateAsync(userToDelete.id);
       toast.success("Utilisateur supprimé avec succès");
       setUserToDelete(null);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Erreur lors de la suppression:", error);
-      toast.error(error.message || "Erreur lors de la suppression de l'utilisateur");
+      const message = error instanceof Error ? error.message : "Erreur lors de la suppression de l'utilisateur";
+      toast.error(message);
     }
   };
 
@@ -153,7 +155,7 @@ export default function UsersPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
             <AlertDialogDescription>
-              Êtes-vous sûr de vouloir supprimer l'utilisateur{" "}
+              Êtes-vous sûr de vouloir supprimer l&apos;utilisateur{" "}
               <strong>
                 {userToDelete?.prenom} {userToDelete?.nom}
               </strong>{" "}

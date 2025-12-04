@@ -84,9 +84,10 @@ export function UserFormSheet({
       }
       onOpenChange(false);
       reset();
-    } catch (error: any) {
+    } catch (error) {
       console.error(`Erreur lors de la ${isEditing ? 'modification' : 'création'} de l'utilisateur:`, error);
-      toast.error(error.message || `Erreur lors de la ${isEditing ? 'modification' : 'création'} de l'utilisateur`);
+      const message = error instanceof Error ? error.message : `Erreur lors de la ${isEditing ? 'modification' : 'création'} de l'utilisateur`;
+      toast.error(message);
     }
   };
 
@@ -192,7 +193,7 @@ export function UserFormSheet({
               <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-sm text-blue-800">
                   <strong>Note :</strong> Après la création, Firebase enverra automatiquement
-                  un email à l'utilisateur avec un lien pour définir son mot de passe.
+                  un email à l&apos;utilisateur avec un lien pour définir son mot de passe.
                 </p>
               </div>
             )}

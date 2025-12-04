@@ -113,8 +113,9 @@ export function DepenseFormSheet({
       }
       form.reset();
       onOpenChange(false);
-    } catch (error: any) {
-      toast.error(error.message || "Une erreur est survenue");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Une erreur est survenue";
+      toast.error(errorMessage);
     }
   };
 
@@ -162,7 +163,7 @@ export function DepenseFormSheet({
           <div className="space-y-6">
             {/* Montant */}
             <Field>
-              <FieldLabel required>Montant (GNF)</FieldLabel>
+              <FieldLabel>Montant (GNF) *</FieldLabel>
               <Controller
                 control={form.control}
                 name="montant"
@@ -183,7 +184,7 @@ export function DepenseFormSheet({
 
             {/* Catégorie */}
             <Field>
-              <FieldLabel required>Catégorie</FieldLabel>
+              <FieldLabel>Catégorie *</FieldLabel>
               <Controller
                 control={form.control}
                 name="categorie"
@@ -215,7 +216,7 @@ export function DepenseFormSheet({
 
             {/* Description */}
             <Field>
-              <FieldLabel required>Description</FieldLabel>
+              <FieldLabel>Description *</FieldLabel>
               <Controller
                 control={form.control}
                 name="description"
@@ -235,7 +236,7 @@ export function DepenseFormSheet({
 
             {/* Date de la dépense */}
             <Field>
-              <FieldLabel required>Date de la dépense</FieldLabel>
+              <FieldLabel>Date de la dépense *</FieldLabel>
               <Controller
                 control={form.control}
                 name="dateDepense"

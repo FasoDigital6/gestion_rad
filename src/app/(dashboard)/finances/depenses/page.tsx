@@ -48,8 +48,9 @@ export default function DepensesPage() {
       await deleteMutation.mutateAsync(depenseToDelete.id);
       toast.success("Dépense supprimée avec succès");
       setDepenseToDelete(null);
-    } catch (error: any) {
-      toast.error(error.message || "Erreur lors de la suppression");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Erreur lors de la suppression";
+      toast.error(message);
     }
   };
 

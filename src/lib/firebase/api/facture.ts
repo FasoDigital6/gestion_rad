@@ -12,7 +12,6 @@ import {
   Timestamp,
   serverTimestamp,
   runTransaction,
-  writeBatch,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/client/config";
 import {
@@ -29,8 +28,8 @@ import type {
   UpdateFactureInput,
   UpdateFactureStatutInput,
 } from "@/lib/types/facture";
-import type { Bdl, BdlLigne } from "@/lib/types/bdl";
-import { getBdl, getBdls } from "./bdl";
+import type { Bdl } from "@/lib/types/bdl";
+import { getBdl } from "./bdl";
 import {
   calculateFactureTotals,
   calculateLignePrixTotal,
@@ -415,7 +414,7 @@ export async function updateFacture(
     const factureRef = doc(db, FACTURES_COLLECTION_NAME, input.id);
 
     // Recalculer les totaux si les lignes ont changé
-    let updateData: any = {
+    let updateData: Record<string, unknown> = {
       ...input,
       dateModification: serverTimestamp(),
     };
@@ -461,7 +460,7 @@ export async function updateFactureStatut(
       const factureRef = doc(db, FACTURES_COLLECTION_NAME, input.id);
       const clientRef = doc(db, CLIENTS_COLLECTION_NAME, facture.clientId);
 
-      const updateData: any = {
+      const updateData: Record<string, unknown> = {
         statut: input.statut,
         dateModification: serverTimestamp(),
       };

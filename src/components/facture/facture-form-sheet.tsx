@@ -393,7 +393,7 @@ export function FactureFormSheet({
                           htmlFor="dateEmission"
                           className="text-foreground font-medium"
                         >
-                          Date d'émission
+                          Date d&apos;émission
                         </FieldLabel>
                         <DatePicker
                           date={field.value}
@@ -423,7 +423,7 @@ export function FactureFormSheet({
                           htmlFor="dateEcheance"
                           className="text-foreground font-medium"
                         >
-                          Date d'échéance (optionnel)
+                          Date d&apos;échéance (optionnel)
                         </FieldLabel>
                         <DatePicker
                           date={field.value}

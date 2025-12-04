@@ -4,7 +4,6 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Facture } from "@/lib/types/facture";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,

@@ -17,13 +17,11 @@ import { db } from "@/lib/firebase/client/config";
 import {
   BDC_COLLECTION_NAME,
   COUNTERS_COLLECTION_NAME,
-  PROFORMAS_COLLECTION_NAME,
 } from "@/lib/firebase/collections_name";
 import {
   Bdc,
   CreateBdcInput,
   UpdateBdcInput,
-  BdcStatut,
   UpdateBdcStatutInput,
   BdcLigne,
 } from "@/lib/types/bdc";
@@ -437,7 +435,7 @@ export async function updateBdc(bdcData: UpdateBdcInput): Promise<void> {
     } else if (updateData.remisePourcentage !== undefined) {
       // Si seulement la remise change, recalculer les totaux
       const lignes = currentBdc.data().lignes || [];
-      const { total, remiseMontant, totalNet } = calculateTotals(
+      const { remiseMontant, totalNet } = calculateTotals(
         lignes,
         updateData.remisePourcentage
       );

@@ -40,9 +40,10 @@ export function UserDetailsSheet({
           : "Utilisateur désactivé avec succès"
       );
       onOpenChange(false);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Erreur lors du changement de statut:", error);
-      toast.error(error.message || "Erreur lors du changement de statut");
+      const message = error instanceof Error ? error.message : "Erreur lors du changement de statut";
+      toast.error(message);
     }
   };
 

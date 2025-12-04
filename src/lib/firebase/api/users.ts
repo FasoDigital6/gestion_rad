@@ -1,8 +1,5 @@
 import {
   collection,
-  addDoc,
-  updateDoc,
-  deleteDoc,
   doc,
   getDocs,
   getDoc,
@@ -130,9 +127,10 @@ export async function createUser(input: CreateUserInput): Promise<void> {
     }
 
     return;
-  } catch (error: any) {
+  } catch (error) {
     console.error("Erreur lors de la création de l'utilisateur:", error);
-    throw new Error(error.message || "Impossible de créer l'utilisateur");
+    const message = error instanceof Error ? error.message : "Impossible de créer l'utilisateur";
+    throw new Error(message);
   }
 }
 
@@ -156,9 +154,10 @@ export async function updateUser(input: UpdateUserParams): Promise<void> {
     }
 
     return;
-  } catch (error: any) {
+  } catch (error) {
     console.error("Erreur lors de la mise à jour de l'utilisateur:", error);
-    throw new Error(error.message || "Impossible de mettre à jour l'utilisateur");
+    const message = error instanceof Error ? error.message : "Impossible de mettre à jour l'utilisateur";
+    throw new Error(message);
   }
 }
 
@@ -174,9 +173,10 @@ export async function deleteUser(id: string): Promise<void> {
     }
 
     return;
-  } catch (error: any) {
+  } catch (error) {
     console.error("Erreur lors de la suppression de l'utilisateur:", error);
-    throw new Error(error.message || "Impossible de supprimer l'utilisateur");
+    const message = error instanceof Error ? error.message : "Impossible de supprimer l'utilisateur";
+    throw new Error(message);
   }
 }
 
@@ -202,9 +202,10 @@ export async function toggleUserStatus(
     }
 
     return;
-  } catch (error: any) {
+  } catch (error) {
     console.error("Erreur lors du changement de statut:", error);
-    throw new Error(error.message || "Impossible de changer le statut de l'utilisateur");
+    const message = error instanceof Error ? error.message : "Impossible de changer le statut de l'utilisateur";
+    throw new Error(message);
   }
 }
 
@@ -222,8 +223,9 @@ export async function createProfile(id: string, data: Partial<User>): Promise<vo
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     }, { merge: true });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Erreur lors de la création du profil:", error);
-    throw new Error(error.message || "Impossible de créer le profil");
+    const message = error instanceof Error ? error.message : "Impossible de créer le profil";
+    throw new Error(message);
   }
 }

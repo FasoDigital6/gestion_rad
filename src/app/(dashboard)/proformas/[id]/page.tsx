@@ -212,7 +212,7 @@ Réseau Africain de Développement (RAD)`;
       <div className="grid gap-6 md:grid-cols-3">
         <Card>
           <CardContent className="p-6">
-            <p className="text-sm font-medium text-gray-600">Date d'émission</p>
+            <p className="text-sm font-medium text-gray-600">Date d&apos;émission</p>
             <p className="text-2xl font-bold text-gray-900 mt-2">
               {format(proforma.dateCreation, "dd MMMM yyyy", { locale: fr })}
             </p>

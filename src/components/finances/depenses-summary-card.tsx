@@ -14,7 +14,6 @@ interface DepensesSummaryCardProps {
 
 export function DepensesSummaryCard({
   depensesParCategorie,
-  totalDepenses,
 }: DepensesSummaryCardProps) {
   // Afficher uniquement les catégories avec des dépenses (top 5)
   const topCategories = depensesParCategorie.slice(0, 5);

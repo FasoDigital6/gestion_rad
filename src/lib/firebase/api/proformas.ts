@@ -22,7 +22,6 @@ import {
   Proforma,
   CreateProformaInput,
   UpdateProformaInput,
-  ProformaStatut,
   UpdateProformaStatutInput,
   ProformaLigne,
 } from "@/lib/types/proforma";
@@ -312,7 +311,7 @@ export async function updateProforma(
     } else if (updateData.remisePourcentage !== undefined) {
       // Si seulement la remise change, recalculer les totaux
       const lignes = currentProforma.data().lignes || [];
-      const { total, remiseMontant, totalNet } = calculateTotals(
+      const { remiseMontant, totalNet } = calculateTotals(
         lignes,
         updateData.remisePourcentage
       );

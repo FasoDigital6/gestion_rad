@@ -59,7 +59,7 @@ export default function LoginPage() {
         router.push("/");
         router.refresh();
       }
-    } catch (err) {
+    } catch {
       setError("Une erreur inattendue s'est produite.");
     } finally {
       setIsLoading(false);
