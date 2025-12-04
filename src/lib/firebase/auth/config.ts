@@ -4,15 +4,15 @@ import { getFirebaseAuth } from "next-firebase-auth-edge";
 
 export const serverConfig = {
     useSecureCookies: process.env.USE_SECURE_COOKIES === "true",
-    firebaseApiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
+    firebaseApiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
     serviceAccount: process.env.SERVICE_ACCOUNT_PRIVATE_KEY
         ? {
-            projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!,
-            clientEmail: process.env.SERVICE_ACCOUNT_CLIENT_EMAIL!,
+            projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '',
+            clientEmail: process.env.SERVICE_ACCOUNT_CLIENT_EMAIL || '',
             privateKey: process.env.SERVICE_ACCOUNT_PRIVATE_KEY.replace(
                 /\\n/g,
                 "\n"
-            )!,
+            ),
         }
         : undefined,
 };
@@ -28,17 +28,17 @@ const firebaseConfig = {
 
 //verify if the the app is already initialized
 let app = getApps().length > 0 ? getApps()[0] : null;
-if (!app) {
+if (!app && firebaseConfig.apiKey) {
     app = initializeApp(firebaseConfig);
 }
-export const auth = getAuth(app);
+export const auth = app ? getAuth(app) : undefined;
 
-export const authConfig = {
+export const authConfig = serverConfig.firebaseApiKey ? {
     apiKey: serverConfig.firebaseApiKey,
-    cookieName: process.env.AUTH_COOKIE_NAME!,
+    cookieName: process.env.AUTH_COOKIE_NAME || 'auth',
     cookieSignatureKeys: [
-        process.env.COOKIE_SECRET_CURRENT!,
-        process.env.COOKIE_SECRET_PREVIOUS!,
+        process.env.COOKIE_SECRET_CURRENT || '',
+        process.env.COOKIE_SECRET_PREVIOUS || '',
     ],
     cookieSerializeOptions: {
         path: "/",
@@ -49,6 +49,6 @@ export const authConfig = {
     },
     serviceAccount: serverConfig.serviceAccount,
     debug: true,
-};
+} : undefined;
 
-export const auth_client = getFirebaseAuth(authConfig);
+export const auth_client = authConfig ? getFirebaseAuth(authConfig) : undefined;
