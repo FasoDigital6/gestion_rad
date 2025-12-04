@@ -17,6 +17,11 @@ const createNextResponseWithHeaders = (request: NextRequest) => {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // If authConfig is not available (during build), allow all requests
+  if (!authConfig || !authConfig.apiKey) {
+    return NextResponse.next();
+  }
+
   //   const isHomePath = pathStartsWith(pathname, HOME_PATHS);
 
   //   if (isHomePath) {
