@@ -15,6 +15,8 @@ if (getApps().length > 0) {
     app = initializeApp(firebase);
 }
 
-export const db: Firestore | undefined = app ? getFirestore(app) : undefined;
-export const auth_client: Auth | undefined = app ? getAuth(app) : undefined;
-export const storage: FirebaseStorage | undefined = app ? getStorage(app) : undefined;
+// These will be undefined during build time but available at runtime
+// Using type assertions to avoid TypeScript errors in runtime code
+export const db = (app ? getFirestore(app) : undefined) as Firestore;
+export const auth_client = (app ? getAuth(app) : undefined) as Auth;
+export const storage = (app ? getStorage(app) : undefined) as FirebaseStorage;

@@ -95,7 +95,7 @@ export default function ProfilPage() {
   };
 
   const handleChangePassword = async () => {
-    if (!auth_client.currentUser) return;
+    if (!auth_client?.currentUser) return;
 
     setPasswordMessage(null);
 

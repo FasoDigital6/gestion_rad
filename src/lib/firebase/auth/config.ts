@@ -31,9 +31,10 @@ let app = getApps().length > 0 ? getApps()[0] : null;
 if (!app && firebaseConfig.apiKey) {
     app = initializeApp(firebaseConfig);
 }
-export const auth = app ? getAuth(app) : undefined;
+// Type assertion for runtime use - will be undefined during build but available at runtime
+export const auth = (app ? getAuth(app) : undefined) as ReturnType<typeof getAuth>;
 
-export const authConfig = serverConfig.firebaseApiKey ? {
+const _authConfig = serverConfig.firebaseApiKey ? {
     apiKey: serverConfig.firebaseApiKey,
     cookieName: process.env.AUTH_COOKIE_NAME || 'auth',
     cookieSignatureKeys: [
@@ -51,4 +52,6 @@ export const authConfig = serverConfig.firebaseApiKey ? {
     debug: true,
 } : undefined;
 
-export const auth_client = authConfig ? getFirebaseAuth(authConfig) : undefined;
+// Type assertion for runtime use
+export const authConfig = _authConfig as NonNullable<typeof _authConfig>;
+export const auth_client = (_authConfig ? getFirebaseAuth(_authConfig) : undefined) as ReturnType<typeof getFirebaseAuth>;
