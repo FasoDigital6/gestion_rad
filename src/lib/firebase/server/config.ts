@@ -13,7 +13,7 @@ if (!getApps().length) {
     initializeApp({
         credential: cert({
             clientEmail: process.env.SERVICE_ACCOUNT_CLIENT_EMAIL,
-            privateKey: process.env.SERVICE_ACCOUNT_PRIVATE_KEY!.replace(/\\n/g, '\n'),
+            privateKey: process.env.SERVICE_ACCOUNT_PRIVATE_KEY?.replace(/\\n/g, '\n') || '',
             projectId,
         }),
         storageBucket,

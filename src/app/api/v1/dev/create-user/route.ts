@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { authAdmin } from "@/lib/firebase/server/config";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
 
     try {
